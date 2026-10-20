@@ -1976,7 +1976,7 @@ textarea:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(13
               <div class="chat-empty" id="chatEmpty">还没有对话记录。可以补充新证据、说明影响变化，或询问下一步该怎么做。</div>
             </div>
             <label class="field followup-field" for="followupInput"><span>补充情况 / 追问</span><textarea id="followupInput" placeholder="输入补充信息或问题；Ctrl+Enter 提交"></textarea></label>
-            <div class="followup-actions"><span class="micro-note">内容保存在当前浏览器，不会发送到服务器。</span><button class="btn btn-primary" id="addFollowup" type="button"><svg class="icon"><use href="#i-arrow"/></svg><span>添加到记录</span></button></div>
+            <div class="followup-actions"><span class="micro-note" id="followupNote">内容保存在当前浏览器，不会发送到服务器。</span><button class="btn btn-primary" id="addFollowup" type="button"><svg class="icon"><use href="#i-arrow"/></svg><span>添加到记录</span></button></div>
           </div>
           <div class="card followup-plan">
             <div class="card-topline"><span class="card-label"><svg class="icon"><use href="#i-check"/></svg>后续处理</span><span class="micro-note" id="planStatus">等待研判</span></div>
@@ -2374,6 +2374,107 @@ textarea:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(13
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+
+  /* ---------------------------------------------------------
+     AI 接入（DeepSeek 流式）—— 密钥只存在于代理服务端
+     把 PRISM_API_ENDPOINT 换成自己的代理地址即自动启用；
+     保留占位符时全站回退到本地规则，不会报错。
+     临时预览可在 URL 后加 ?api=https://your-proxy/chat
+     代理见 proxy/ 目录与 README「接入 API」。
+     --------------------------------------------------------- */
+  const API_OVERRIDE = new URLSearchParams(location.search).get("api");
+  const PRISM_API_ENDPOINT = (API_OVERRIDE || "https://REPLACE-ME.workers.dev/chat").trim();
+  const PRISM_API_MODEL = "deepseek-chat";
+  const PRISM_API_TIMEOUT = 60000;
+  const PRISM_API_ENABLED = Boolean(PRISM_API_ENDPOINT) && !PRISM_API_ENDPOINT.includes("REPLACE-ME");
+
+  const AI_SYSTEM_PROMPT = "你是 PRISM 事件研判工作台的辅助分析员，具备危机公关、传播学、法律合规与企业经营经验。只使用用户材料中可核验的信息；无法确认的内容必须标注为「未知」，不得编造信源、联系人、电话或数据。回答使用中文，250 字以内，先给结论再给依据，用分点陈述，语气克制，不做绝对承诺。";
+
+  function buildAIMessages(question, level, score) {
+    const material = (eventText?.value || "").trim() || "（尚未填写事件描述）";
+    const context = [
+      "【事件材料】\n" + material,
+      level
+        ? `【本地规则初筛】${level}${score ? "，综合风险分 " + score + "/100" : ""}（仅提示核查优先级，不代表事实已确认）`
+        : "",
+      "【用户补充或追问】\n" + question,
+    ].filter(Boolean).join("\n\n");
+    return [
+      { role: "system", content: AI_SYSTEM_PROMPT },
+      { role: "user", content: context + "\n\n请针对上述追问给出 3-5 条可执行建议。" },
+    ];
+  }
+
+  async function streamAI(messages, onDelta) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), PRISM_API_TIMEOUT);
+    try {
+      const response = await fetch(PRISM_API_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages, model: PRISM_API_MODEL }),
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        const detail = await response.text().catch(() => "");
+        throw new Error("HTTP " + response.status + (detail ? " " + detail.slice(0, 160) : ""));
+      }
+      if (!response.body) throw new Error("当前浏览器不支持流式响应");
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let buffer = "";
+      while (true) {
+        const chunk = await reader.read();
+        if (chunk.done) break;
+        buffer += decoder.decode(chunk.value, { stream: true });
+        const frames = buffer.split("\n\n");
+        buffer = frames.pop() || "";
+        for (const frame of frames) {
+          for (const line of frame.split("\n")) {
+            const trimmed = line.trim();
+            if (!trimmed.startsWith("data:")) continue;
+            const payload = trimmed.slice(5).trim();
+            if (!payload || payload === "[DONE]") continue;
+            let parsed;
+            try { parsed = JSON.parse(payload); } catch (error) { continue; }
+            const delta = parsed?.choices?.[0]?.delta?.content;
+            if (delta) onDelta(delta);
+          }
+        }
+      }
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  /* 未启用 AI 时的本地提示，作为降级兜底 */
+  function localReply(value, assessedLevel) {
+    const hasAssessment = assessedLevel && assessedLevel.startsWith("L");
+    if (!hasAssessment) {
+      return "已记录补充内容。先在上方填写事件描述并点击「识别并判断等级」，再结合完整情况安排处置。请核对信息来源，并区分已确认事实与推测。";
+    }
+    if (/下一步|怎么办|如何处理|建议|行动|处理/.test(value)) {
+      return `当前初筛为 ${assessedLevel}。建议先确认是否存在持续损害或人员安全风险，再保全原始材料、核对关键事实，并为每项行动指定负责人和完成时限。重大或紧急风险请升级给相应负责人或主管部门。`;
+    }
+    if (/等级|风险|严重|级别/.test(value)) {
+      return `当前文本规则初筛为 ${assessedLevel}，综合风险分 ${$("#overallRiskScore")?.textContent || "待判断"}/100。该结果只用于提示核查优先级，不代表事实已确认；请根据新证据更新事件描述后重新研判。`;
+    }
+    if (/负责人|谁来|联系|通知/.test(value)) {
+      return "建议按事项指定岗位负责人：现场与人员安全、事实核查、法律合规、对外沟通和记录归档。请使用组织内已确认的职责分工与联络方式。";
+    }
+    return `已记录这条补充。请确认它是亲历信息、原始材料还是转述内容，并注明发生时间、来源和可能受影响对象；当前研判等级为 ${assessedLevel}，有新证据时可更新事件描述并重新判断。`;
+  }
+
+  function persistChat() {
+    try { localStorage.setItem("prism-followup-v1", $("#chatThread")?.innerText || ""); } catch (error) { /* 忽略不可用的本地存储 */ }
+  }
+
+  const followupNote = $("#followupNote");
+  if (followupNote) {
+    followupNote.textContent = PRISM_API_ENABLED
+      ? "本轮输入会发送到分析服务；记录仍只保存在当前浏览器。请勿粘贴未公开的个人信息或商业秘密。"
+      : "内容保存在当前浏览器，不会发送到服务器。";
+  }
 
   const STRATEGIES = {
     a: { name: "4 小时事实边界声明", short: "事实声明", prob: 74, cost: 6, rank: 1 },
@@ -3648,12 +3749,12 @@ ${notes}
     location.reload();
   });
 
-  $("#addFollowup")?.addEventListener("click", () => {
+  $("#addFollowup")?.addEventListener("click", async () => {
     const input = $("#followupInput");
     const value = input?.value.trim();
     if (!value) { showToast("请先填写补充情况或追问"); input?.focus(); return; }
-    const empty = $("#chatEmpty");
-    empty?.remove();
+    $("#chatEmpty")?.remove();
+
     const entry = document.createElement("div");
     entry.className = "chat-entry";
     const stamp = document.createElement("small");
@@ -3662,35 +3763,57 @@ ${notes}
     body.textContent = value;
     entry.append(stamp, body);
     $("#chatThread")?.appendChild(entry);
+
+    const assessedLevel = $("#heroLevelCode")?.textContent || "";
+    const score = ($("#overallRiskScore")?.textContent || "").replace(/[^\d]/g, "");
+
     const reply = document.createElement("div");
     reply.className = "chat-entry assistant-entry";
     const replyLabel = document.createElement("small");
-    replyLabel.textContent = "PRISM · 本地辅助提示";
+    replyLabel.textContent = PRISM_API_ENABLED ? "PRISM · AI 辅助分析" : "PRISM · 本地辅助提示";
     const replyBody = document.createElement("p");
-    const assessedLevel = $("#heroLevelCode")?.textContent;
-    const hasAssessment = assessedLevel && assessedLevel.startsWith("L");
-    if (!hasAssessment) {
-      replyBody.textContent = "已记录补充内容。先在上方填写事件描述并点击「识别并判断等级」，再结合完整情况安排处置。请核对信息来源，并区分已确认事实与推测。";
-    } else if (/下一步|怎么办|如何处理|建议|行动|处理/.test(value)) {
-      replyBody.textContent = `当前初筛为 ${assessedLevel}。建议先确认是否存在持续损害或人员安全风险，再保全原始材料、核对关键事实，并为每项行动指定负责人和完成时限。重大或紧急风险请升级给相应负责人或主管部门。`;
-    } else if (/等级|风险|严重|级别/.test(value)) {
-      replyBody.textContent = `当前文本规则初筛为 ${assessedLevel}，综合风险分 ${$("#overallRiskScore")?.textContent || "待判断"}/100。该结果只用于提示核查优先级，不代表事实已确认；请根据新证据更新事件描述后重新研判。`;
-    } else if (/负责人|谁来|联系|通知/.test(value)) {
-      replyBody.textContent = "建议按事项指定岗位负责人：现场与人员安全、事实核查、法律合规、对外沟通和记录归档。请使用组织内已确认的职责分工与联络方式。";
-    } else {
-      replyBody.textContent = `已记录这条补充。请确认它是亲历信息、原始材料还是转述内容，并注明发生时间、来源和可能受影响对象；当前研判等级为 ${assessedLevel}，有新证据时可更新事件描述并重新判断。`;
-    }
     reply.append(replyLabel, replyBody);
     $("#chatThread")?.appendChild(reply);
     reply.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
     const notes = $("#handlingNotes");
     if (notes) {
       notes.value = [notes.value.trim(), value].filter(Boolean).join("\n");
       try { localStorage.setItem("prism-handling-v1", notes.value); } catch (error) { /* 忽略不可用的本地存储 */ }
     }
     input.value = "";
-    try { localStorage.setItem("prism-followup-v1", $("#chatThread").innerText); } catch (error) { /* 忽略不可用的本地存储 */ }
-    showToast("已记录，并生成本地辅助提示");
+
+    if (!PRISM_API_ENABLED) {
+      replyBody.textContent = localReply(value, assessedLevel);
+      persistChat();
+      showToast("已记录，并生成本地辅助提示");
+      return;
+    }
+
+    const button = $("#addFollowup");
+    setButtonBusy(button, true, "分析中…");
+    replyBody.textContent = "正在分析…";
+    let streamed = "";
+    try {
+      await streamAI(buildAIMessages(value, assessedLevel, score), (delta) => {
+        if (!streamed) replyBody.textContent = "";
+        streamed += delta;
+        replyBody.textContent = streamed;
+        reply.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+      if (!streamed) replyBody.textContent = localReply(value, assessedLevel);
+      persistChat();
+      showToast("AI 分析完成");
+    } catch (error) {
+      const fallback = localReply(value, assessedLevel);
+      replyBody.textContent = streamed
+        ? `${streamed}\n\n（输出中断：${error.message}）`
+        : `${fallback}\n\n（AI 服务暂不可用，已回退到本地提示：${error.message}）`;
+      persistChat();
+      showToast("AI 服务不可用，已回退到本地提示");
+    } finally {
+      setButtonBusy(button, false, "添加到记录");
+    }
   });
 
   $("#followupInput")?.addEventListener("keydown", (event) => {

@@ -1,0 +1,11 @@
+name = "prism-proxy"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+# 前端来源白名单：GitHub Pages 站点 + Streamlit Cloud 应用 + 本地预览
+[vars]
+ALLOWED_ORIGINS = "https://519960197.github.io,https://prism-judge.streamlit.app,http://127.0.0.1:8000,http://localhost:8000"
+
+# 密钥不要写在这里（会进 git）。用命令行设置：
+#   npx wrangler secret put DEEPSEEK_API_KEY
+# 或在 Cloudflare 控制台 Workers -> 你的 worker -> Settings -> Variables 添加加密变量

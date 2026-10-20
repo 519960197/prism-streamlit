@@ -6,3 +6,5 @@ env/
 .streamlit/secrets.toml
 .DS_Store
 Thumbs.db
+node_modules/
+.wrangler/
