@@ -1,0 +1,3741 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PRISM 危机公关处理器——从素材采集、五级研判到策略组合推演的一站式危机决策演示。单文件离线版。">
+  <meta name="theme-color" content="#0d1215">
+  <title>PRISM · 危机公关处理器（微信分享版）</title>
+  <style>
+/* =========================================================
+   PRISM — Crisis PR Processor
+   Concept demo styles
+   ========================================================= */
+
+:root{
+  --ink:#0d1215;
+  --ink-2:#11191d;
+  --ink-3:#182226;
+  --paper:#f1ede3;
+  --paper-2:#faf7ef;
+  --paper-3:#f6f1e6;
+  --line:#d8d0c0;
+  --line-strong:#c4baa6;
+  --muted:#746f63;
+  --muted-2:#969083;
+  --red:#df4a2f;
+  --red-deep:#b8321d;
+  --red-soft:#f6ddd6;
+  --amber:#e6a11a;
+  --amber-soft:#f7e9c6;
+  --lime:#c8f36a;
+  --lime-strong:#b4e64c;
+  --green:#4c8b72;
+  --green-soft:#dcebe3;
+  --blue:#5b7f9c;
+  --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+  --sans:"Inter","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+  --mono:"SFMono-Regular","Cascadia Mono","Roboto Mono",Consolas,"Liberation Mono",monospace;
+  --shadow:0 1px 0 rgba(255,255,255,.7) inset,0 12px 32px rgba(44,34,14,.045);
+  --sidebar:236px;
+  --radius:16px;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:88px}
+body{
+  margin:0;
+  min-width:320px;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:14px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background-image:radial-gradient(rgba(30,24,13,.12) .55px,transparent .55px);
+  background-size:20px 20px;
+  opacity:.35;
+}
+::selection{background:var(--lime);color:var(--ink)}
+a{color:inherit;text-decoration:none}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
+  outline:2px solid var(--red);
+  outline-offset:3px;
+}
+h1,h2,h3,p{margin:0}
+ul,ol{margin:0;padding:0;list-style:none}
+.svg-sprite{position:absolute;width:0;height:0;overflow:hidden}
+.icon{
+  width:18px;height:18px;flex:0 0 auto;
+  fill:none;stroke:currentColor;stroke-width:1.7;
+  stroke-linecap:round;stroke-linejoin:round;
+}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.desktop-break{display:block}
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+.sidebar{
+  position:fixed;
+  inset:0 auto 0 0;
+  z-index:40;
+  width:var(--sidebar);
+  display:flex;
+  flex-direction:column;
+  padding:24px 18px 18px;
+  overflow-y:auto;
+  color:#e9ede3;
+  background:
+    radial-gradient(circle at 20% 0%,rgba(200,243,106,.07),transparent 32%),
+    linear-gradient(180deg,#10171a 0%,#0b1013 100%);
+  border-right:1px solid rgba(255,255,255,.08);
+}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14)}
+.brand{display:flex;align-items:center;gap:12px;padding:2px 8px 28px}
+.brand-mark{
+  width:32px;height:32px;flex:0 0 auto;
+  display:flex;align-items:flex-end;gap:3px;
+  padding:1px 2px;
+  transform:skew(-11deg);
+}
+.brand-mark i{
+  display:block;width:7px;height:28px;
+  background:var(--lime);border-radius:1px 1px 2px 2px;
+  transform-origin:bottom;
+}
+.brand-mark i:nth-child(2){height:20px;background:#f4f0e4}
+.brand-mark i:nth-child(3){height:12px;background:var(--red)}
+.brand-mark.small{width:20px;height:20px;gap:2px;padding:0;transform:skew(-11deg)}
+.brand-mark.small i{width:4px;height:17px}
+.brand-mark.small i:nth-child(2){height:12px}
+.brand-mark.small i:nth-child(3){height:8px}
+.brand-type{display:flex;flex-direction:column;line-height:1.2}
+.brand-type strong{
+  font-family:var(--mono);
+  font-size:18px;
+  letter-spacing:.22em;
+  font-weight:700;
+}
+.brand-type small{
+  margin-top:4px;
+  color:#8f978f;
+  font-size:10px;
+  letter-spacing:.08em;
+}
+.side-case{
+  position:relative;
+  margin:0 4px 24px;
+  padding:14px 14px 12px;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;
+  background:linear-gradient(150deg,rgba(255,255,255,.055),rgba(255,255,255,.018));
+}
+.side-case::before{
+  content:"";
+  position:absolute;left:-1px;top:14px;bottom:14px;
+  width:2px;background:var(--amber);
+}
+.side-label{
+  display:block;
+  color:#77817a;
+  font-family:var(--mono);
+  font-size:8px;
+  letter-spacing:.16em;
+  margin-bottom:7px;
+}
+.side-case p{font-size:12px;line-height:1.55;color:#e9ede3;font-weight:600}
+.side-case-meta{display:flex;align-items:center;gap:7px;margin-top:10px;color:#9aa29a;font-size:10px}
+.side-level{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:23px;height:19px;border-radius:3px;
+  color:var(--ink);background:var(--amber);
+  font-family:var(--mono);font-size:9px;font-weight:700;
+}
+.side-pulse{
+  width:5px;height:5px;border-radius:50%;background:var(--red);
+  margin-left:auto;box-shadow:0 0 0 4px rgba(223,74,47,.12);
+  animation:pulse 2.4s ease-in-out infinite;
+}
+.side-nav{display:flex;flex-direction:column;gap:2px}
+.side-nav a{
+  position:relative;
+  display:flex;align-items:center;gap:12px;
+  min-height:36px;padding:7px 10px;
+  border:1px solid transparent;border-radius:7px;
+  color:#8f978f;font-size:12px;
+  transition:background .2s,color .2s,border-color .2s;
+}
+.side-nav a span{
+  width:18px;color:#5e6862;
+  font-family:var(--mono);font-size:9px;letter-spacing:.04em;
+}
+.side-nav a:hover{color:#e9ede3;background:rgba(255,255,255,.035)}
+.side-nav a.active{
+  color:#f7f4eb;background:rgba(255,255,255,.065);
+  border-color:rgba(255,255,255,.07);
+}
+.side-nav a.active span{color:var(--lime)}
+.side-nav a.active::after{
+  content:"";width:4px;height:4px;margin-left:auto;
+  border-radius:50%;background:var(--lime);
+  box-shadow:0 0 10px rgba(200,243,106,.8);
+}
+.side-bottom{margin-top:auto;padding-top:28px}
+.side-progress{
+  margin:0 4px 16px;padding-top:14px;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.side-progress-head{display:flex;justify-content:space-between;font-size:9px;color:#7e8881}
+.side-progress-head b{font-family:var(--mono);color:#c8cec5;font-weight:500}
+.side-progress-track{height:3px;background:rgba(255,255,255,.08);border-radius:2px;margin:8px 0 7px;overflow:hidden}
+.side-progress-track i{display:block;width:68%;height:100%;background:var(--lime);border-radius:2px}
+.side-progress p{font-size:9px;line-height:1.5;color:#5f6962}
+.side-status{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:11px 8px 0;border-top:1px solid rgba(255,255,255,.08);
+  font-family:var(--mono);font-size:8px;color:#616c65;letter-spacing:.08em;
+}
+.side-status>span:first-child{display:flex;align-items:center;gap:6px}
+.status-dot{width:4px;height:4px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
+.sidebar-scrim{display:none}
+
+/* =========================================================
+   APP / TOPBAR
+   ========================================================= */
+.app{
+  margin-left:var(--sidebar);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+.topbar{
+  position:sticky;top:0;z-index:30;
+  height:66px;flex:0 0 auto;
+  display:flex;align-items:center;gap:18px;
+  padding:0 30px;
+  background:rgba(241,237,227,.88);
+  border-bottom:1px solid rgba(196,186,166,.55);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+.crumb{
+  display:flex;align-items:center;gap:9px;
+  min-width:0;color:#8a8477;font-size:11px;white-space:nowrap;
+}
+.crumb i{font-style:normal;color:#bcb4a3}
+.crumb strong{color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.top-actions{display:flex;align-items:center;gap:10px;margin-left:auto}
+.demo-pill{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:5px 9px;border:1px solid var(--line);
+  border-radius:99px;background:rgba(255,255,255,.45);
+  font-family:var(--mono);font-size:8px;color:#7c7567;letter-spacing:.04em;
+}
+.demo-pill i{width:5px;height:5px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 3px rgba(230,161,26,.12)}
+.icon-btn{
+  width:32px;height:32px;display:inline-grid;place-items:center;
+  border:1px solid var(--line);border-radius:50%;background:transparent;
+  transition:background .2s,transform .2s;
+}
+.icon-btn:hover{background:#fff}
+.icon-btn .icon{width:15px;height:15px}
+.avatar{
+  width:30px;height:30px;display:grid;place-items:center;
+  border-radius:50%;background:var(--ink);color:var(--lime);
+  font-family:var(--mono);font-size:11px;font-weight:700;
+}
+.mobile-menu{
+  display:none;width:34px;height:34px;place-items:center;
+  border:1px solid var(--line);border-radius:50%;background:transparent;
+}
+main{padding:24px 30px 0;flex:1}
+
+/* =========================================================
+   BUTTONS / BASIC
+   ========================================================= */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  min-height:42px;padding:9px 17px;
+  border:1px solid transparent;border-radius:8px;
+  font-size:12px;font-weight:600;letter-spacing:.01em;
+  transition:transform .18s,background .18s,border-color .18s,box-shadow .18s;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn .icon{width:15px;height:15px;transition:transform .18s}
+.btn:hover .icon:last-child{transform:translateX(2px)}
+.btn-sm{min-height:34px;padding:7px 12px;font-size:11px}
+.btn-primary{background:var(--ink);color:#f4f0e4;border-color:var(--ink)}
+.btn-primary:hover{background:#1b2529;box-shadow:0 8px 20px rgba(13,18,21,.14)}
+.btn-lime{background:var(--lime);color:var(--ink);border-color:var(--lime);font-weight:700}
+.btn-lime:hover{background:var(--lime-strong);box-shadow:0 8px 24px rgba(200,243,106,.14)}
+.btn-outline{background:transparent;border-color:var(--line-strong);color:var(--ink)}
+.btn-outline:hover{background:#fff}
+.btn-ghost{
+  color:#e9ede3;border-color:rgba(255,255,255,.18);
+  background:rgba(255,255,255,.04);
+}
+.btn-ghost:hover{background:rgba(255,255,255,.1)}
+.btn:disabled{opacity:.55;cursor:wait;transform:none}
+.text-btn{
+  border:0;background:none;padding:0;
+  color:var(--muted);font-size:11px;
+  border-bottom:1px solid transparent;
+  transition:color .2s,border-color .2s;
+}
+.text-btn:hover{color:var(--ink);border-color:var(--ink)}
+.card{
+  position:relative;
+  background:var(--paper-2);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+.card-label{
+  display:flex;align-items:center;gap:8px;
+  font-size:11px;font-weight:700;letter-spacing:.02em;
+}
+.card-label .icon{width:15px;height:15px;color:var(--red)}
+.card-label.light{color:#e9ede3}
+.card-label.light .icon{color:var(--lime)}
+.micro-note{font-family:var(--mono);font-size:9px;color:var(--muted-2);letter-spacing:.03em}
+.card-topline{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.eyebrow{
+  font-family:var(--mono);
+  font-size:9px;font-weight:600;
+  letter-spacing:.18em;color:var(--red);
+  text-transform:uppercase;
+}
+.eyebrow.light{color:var(--lime)}
+
+/* =========================================================
+   HERO
+   ========================================================= */
+.hero{
+  position:relative;
+  overflow:hidden;
+  padding:40px 42px 0;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:20px;
+  color:#eef1e8;
+  background:
+    radial-gradient(circle at 84% 20%,rgba(223,74,47,.16),transparent 30%),
+    radial-gradient(circle at 12% 100%,rgba(200,243,106,.055),transparent 34%),
+    linear-gradient(135deg,#11191c 0%,#0d1316 58%,#111711 100%);
+  box-shadow:0 22px 60px rgba(24,18,7,.14);
+  isolation:isolate;
+}
+.hero::before{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:88px 88px;
+  mask-image:linear-gradient(90deg,rgba(0,0,0,.7),transparent 80%);
+  -webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,.7),transparent 80%);
+}
+.hero::after{
+  content:"0042";
+  position:absolute;right:28px;bottom:58px;z-index:-1;
+  color:rgba(255,255,255,.025);
+  font-family:var(--mono);font-size:180px;font-weight:700;line-height:1;
+  letter-spacing:-.09em;
+}
+.hero-grid{
+  display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,.72fr);
+  gap:54px;align-items:start;
+}
+.hero-main{min-width:0}
+.case-kicker{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  margin-bottom:23px;
+  color:#7d8780;font-family:var(--mono);font-size:8px;letter-spacing:.15em;
+}
+.case-kicker span:first-child{color:var(--lime)}
+.case-kicker i{width:3px;height:3px;border-radius:50%;background:#53605a}
+.hero h1{
+  max-width:780px;
+  font-size:clamp(36px,4vw,57px);
+  line-height:1.14;
+  font-weight:600;
+  letter-spacing:-.055em;
+}
+.hero h1 em{
+  color:var(--lime);
+  font-family:var(--serif);
+  font-style:italic;
+  font-weight:500;
+  letter-spacing:-.06em;
+  position:relative;
+}
+.hero h1 em::after{
+  content:"";position:absolute;left:2px;right:4px;bottom:-2px;
+  height:1px;background:linear-gradient(90deg,var(--lime),transparent);
+  opacity:.55;
+}
+.hero-lede{
+  max-width:650px;margin-top:21px;
+  color:#aeb7af;font-size:14px;line-height:1.85;
+}
+.hero-brief{
+  position:relative;
+  display:flex;gap:14px;
+  max-width:680px;margin-top:30px;padding:15px 16px 15px 18px;
+  border:1px solid rgba(255,255,255,.08);
+  border-left:2px solid var(--lime);
+  border-radius:5px 10px 10px 5px;
+  background:rgba(255,255,255,.035);
+}
+.hero-brief::after{
+  content:"";position:absolute;right:12px;top:12px;
+  width:5px;height:5px;border-radius:50%;background:rgba(200,243,106,.65);
+}
+.brief-label{
+  display:flex;align-items:flex-start;gap:5px;
+  padding-top:2px;flex:0 0 auto;
+  color:var(--lime);font-family:var(--mono);font-size:8px;letter-spacing:.08em;
+}
+.brief-label .icon{width:12px;height:12px}
+.hero-brief p{color:#b7bfb6;font-size:12px;line-height:1.8}
+.hero-brief strong{color:#f2f5ec;font-weight:600}
+.hero-actions{display:flex;gap:10px;margin-top:29px}
+.hero-actions .btn{min-height:44px}
+.hero-side{
+  justify-self:end;
+  width:100%;max-width:330px;
+  padding-top:10px;
+}
+.risk-ring-wrap{position:relative;width:218px;height:218px;margin:0 auto}
+.risk-ring{width:100%;height:100%;overflow:visible;transform:rotate(-90deg)}
+.ring-track{fill:none;stroke:rgba(255,255,255,.075);stroke-width:8}
+.ring-ticks{
+  fill:none;stroke:rgba(255,255,255,.2);stroke-width:1;
+  stroke-dasharray:1 13.7;
+}
+.ring-value{
+  fill:none;
+  stroke:var(--red);
+  stroke-width:8;
+  stroke-linecap:round;
+  stroke-dasharray:367 541;
+  filter:drop-shadow(0 0 8px rgba(223,74,47,.38));
+  transition:stroke-dasharray .9s cubic-bezier(.2,.7,.2,1);
+}
+.ring-dot{fill:var(--lime);opacity:.55}
+.risk-ring-content{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.risk-label{
+  font-family:var(--mono);font-size:8px;letter-spacing:.18em;
+  color:#727c75;margin-bottom:2px;
+}
+.risk-ring-content strong{
+  font-family:var(--sans);font-size:55px;font-weight:600;
+  letter-spacing:-.07em;line-height:1.05;
+}
+.risk-total{font-family:var(--mono);font-size:9px;color:#727c75;margin-top:2px}
+.hero-level{
+  display:flex;align-items:center;gap:12px;
+  margin-top:2px;padding:12px 14px;
+  border:1px solid rgba(255,255,255,.09);border-radius:8px;
+  background:rgba(255,255,255,.035);
+}
+.level-tag{
+  display:grid;place-items:center;
+  width:37px;height:37px;flex:0 0 auto;
+  border-radius:4px;background:var(--amber);color:#1b1505;
+  font-family:var(--mono);font-size:14px;font-weight:800;
+}
+.hero-level div{display:flex;flex-direction:column;min-width:0}
+.hero-level strong{font-size:14px;font-weight:600;letter-spacing:.02em}
+.hero-level small{color:#828d85;font-size:9px;margin-top:1px}
+.hero-metrics{
+  display:grid;grid-template-columns:1fr 1fr;
+  margin-top:14px;
+  border-top:1px solid rgba(255,255,255,.08);
+  border-left:1px solid rgba(255,255,255,.08);
+}
+.hero-metrics>div{
+  display:flex;flex-direction:column;gap:2px;
+  padding:12px 13px 11px;
+  border-right:1px solid rgba(255,255,255,.08);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.hero-metrics span{color:#79847d;font-size:9px}
+.hero-metrics strong{
+  font-size:22px;font-weight:500;line-height:1.25;
+  font-variant-numeric:tabular-nums;letter-spacing:-.03em;
+}
+.hero-metrics small{font-family:var(--mono);font-size:8px;color:#7f8a82;margin-left:2px;font-weight:400}
+.hero-ticker{
+  display:flex;align-items:center;gap:28px;
+  margin-top:35px;padding:13px 0;
+  border-top:1px solid rgba(255,255,255,.08);
+  color:#727d76;font-family:var(--mono);font-size:8px;
+  letter-spacing:.03em;white-space:nowrap;overflow:hidden;
+}
+.hero-ticker span{display:inline-flex;align-items:center;gap:7px}
+.hero-ticker b{color:#b6bfb6;font-weight:500}
+.ticker-live{margin-left:auto;color:var(--lime)}
+.ticker-live i{width:4px;height:4px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime)}
+
+/* =========================================================
+   SECTION FRAME
+   ========================================================= */
+.section{padding-top:76px}
+.section-head{
+  display:grid;
+  grid-template-columns:54px minmax(0,1fr) 220px;
+  gap:20px;
+  align-items:start;
+  margin-bottom:28px;
+  padding-top:16px;
+  border-top:1px solid var(--line-strong);
+}
+.section-index{
+  display:flex;flex-direction:column;gap:10px;
+  padding-top:2px;
+  color:var(--red);
+  font-family:var(--mono);
+}
+.section-index span{font-size:11px;letter-spacing:.08em}
+.section-index i{display:block;width:28px;height:1px;background:var(--red);opacity:.55}
+.section-title{min-width:0}
+.section-title h2{
+  margin-top:7px;
+  font-family:var(--serif);
+  font-size:clamp(28px,3vw,40px);
+  font-weight:600;
+  line-height:1.22;
+  letter-spacing:-.04em;
+}
+.section-title>p:last-child{
+  max-width:680px;margin-top:10px;
+  color:var(--muted);font-size:12.5px;line-height:1.8;
+}
+.section-note{
+  justify-self:end;
+  padding:12px 0 0 14px;
+  border-left:2px solid var(--lime-strong);
+  color:var(--muted-2);
+  font-family:var(--mono);font-size:8px;line-height:1.9;
+  letter-spacing:.03em;
+}
+.section-note span{display:block;margin-bottom:4px;color:var(--red);font-weight:600;letter-spacing:.1em}
+
+/* =========================================================
+   INPUT
+   ========================================================= */
+.input-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(340px,.78fr);gap:18px}
+.input-card{padding:22px 24px 20px}
+.field{margin-top:20px}
+.field>label{
+  display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;
+  margin-bottom:8px;
+  font-size:11px;font-weight:700;
+}
+.field>label span{color:var(--muted-2);font-size:9px;font-weight:400}
+textarea{
+  width:100%;min-height:94px;
+  display:block;resize:vertical;
+  padding:14px 15px;
+  border:1px solid var(--line);
+  border-radius:7px;
+  background:#fffdf7;
+  color:#2e312d;
+  font-size:12.5px;line-height:1.85;
+  transition:border-color .2s,box-shadow .2s;
+}
+textarea:hover{border-color:var(--line-strong)}
+textarea:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(13,18,21,.06)}
+.textarea-foot{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-top:7px;color:var(--muted-2);font-size:9px;
+}
+.textarea-foot b{font-family:var(--mono);color:var(--muted);font-weight:500}
+.input-split{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;
+  margin-top:21px;padding-top:20px;border-top:1px solid var(--line);
+}
+.file-block{min-width:0}
+.dropzone{
+  min-height:79px;
+  display:flex;align-items:center;gap:11px;
+  padding:11px 12px;
+  border:1px dashed var(--line-strong);
+  border-radius:8px;
+  background:rgba(255,255,255,.35);
+  cursor:pointer;
+  transition:background .2s,border-color .2s;
+}
+.dropzone:hover,.dropzone.dragover{background:#fffdf8;border-color:var(--ink)}
+.drop-icon{
+  width:32px;height:32px;display:grid;place-items:center;flex:0 0 auto;
+  border-radius:6px;background:var(--paper-3);color:var(--muted);
+}
+.drop-icon .icon{width:16px;height:16px}
+.dropzone>span:nth-child(3){display:flex;flex-direction:column;min-width:0}
+.dropzone strong{font-size:10px;font-weight:600}
+.dropzone small{
+  margin-top:2px;color:var(--muted-2);font-size:8px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.drop-action{
+  margin-left:auto;flex:0 0 auto;
+  padding:5px 8px;border:1px solid var(--line);border-radius:4px;
+  color:var(--muted);font-size:8px;background:#fffdf8;
+}
+.file-list{display:flex;flex-direction:column;gap:5px;margin-top:7px}
+.file-chip{
+  display:flex;align-items:center;gap:8px;
+  padding:5px 8px;border:1px solid var(--line);border-radius:4px;
+  background:#fffdf8;
+  font-size:9px;
+}
+.file-chip .icon{width:12px;height:12px;color:var(--red)}
+.file-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-chip em{margin-left:auto;font-style:normal;font-family:var(--mono);font-size:8px;color:var(--muted-2)}
+.keyword-block>label{display:block;margin-bottom:8px;font-size:11px;font-weight:700}
+.tag-input{
+  min-height:34px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;
+  padding:5px 7px;
+  border:1px solid var(--line);border-radius:6px;background:#fffdf7;
+}
+.tag-input:focus-within{border-color:var(--ink)}
+.tag-chip{
+  display:inline-flex;align-items:center;gap:2px;
+  padding:3px 6px;border-radius:3px;
+  background:var(--paper-3);color:#4f4b41;font-size:9px;white-space:nowrap;
+}
+.tag-chip button{
+  width:13px;height:13px;padding:0;border:0;background:none;
+  color:#9c9586;font-size:12px;line-height:1;
+}
+.tag-chip button:hover{color:var(--red)}
+.tag-input input{flex:1;min-width:95px;border:0;outline:none;background:transparent;font-size:9px;padding:3px 2px}
+.channel-title{margin:13px 0 6px;font-size:9px;font-weight:600;color:#555147}
+.channel-title span{font-weight:400;color:var(--muted-2)}
+.channel-list{display:flex;flex-wrap:wrap;gap:4px}
+.channel{
+  padding:4px 8px;border:1px solid var(--line);border-radius:99px;
+  background:transparent;color:var(--muted);font-size:8px;
+  transition:background .2s,color .2s,border-color .2s;
+}
+.channel:hover{border-color:var(--line-strong);color:var(--ink)}
+.channel.active{background:var(--ink);border-color:var(--ink);color:#f4f0e4}
+.input-actions{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  margin-top:21px;padding-top:18px;border-top:1px solid var(--line);
+}
+.input-actions .btn{min-width:164px}
+.scan-note{
+  display:flex;align-items:center;gap:5px;
+  color:var(--muted-2);font-size:8.5px;
+}
+.scan-note .icon{width:13px;height:13px;color:var(--green)}
+
+.scan-panel{
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;
+  padding:21px 20px 18px;
+  border:1px solid #263135;border-radius:var(--radius);
+  color:#e9ede3;
+  background:
+    radial-gradient(circle at 75% 14%,rgba(200,243,106,.065),transparent 30%),
+    linear-gradient(155deg,#141d20,#0e1518);
+  box-shadow:0 14px 35px rgba(20,16,7,.09);
+}
+.scan-panel::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px);
+  background-size:100% 27px;
+  mask-image:linear-gradient(180deg,rgba(0,0,0,.9),transparent);
+  -webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,.9),transparent);
+}
+.scan-head{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between}
+.live-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  color:var(--lime);font-family:var(--mono);font-size:8px;letter-spacing:.1em;
+}
+.live-tag i{width:4px;height:4px;border-radius:50%;background:var(--lime);box-shadow:0 0 7px var(--lime);animation:pulse 2.4s infinite}
+.radar-wrap{
+  position:relative;z-index:1;
+  display:flex;align-items:center;gap:22px;
+  margin:19px 0 17px;
+}
+.radar{
+  position:relative;flex:0 0 auto;
+  width:146px;height:146px;
+  border:1px solid rgba(200,243,106,.16);
+  border-radius:50%;
+  background:
+    radial-gradient(circle,transparent 0 19%,rgba(200,243,106,.11) 19.4% 19.8%,transparent 20.2% 42%,rgba(200,243,106,.1) 42.4% 42.8%,transparent 43.2% 66%,rgba(200,243,106,.09) 66.4% 66.8%,transparent 67.2%),
+    radial-gradient(circle at 40% 35%,rgba(255,255,255,.035),transparent 60%),
+    #0a1012;
+  overflow:hidden;
+  box-shadow:inset 0 0 30px rgba(0,0,0,.4);
+}
+.radar-circle{position:absolute;inset:16%;border:1px solid rgba(200,243,106,.06);border-radius:50%}
+.radar-circle.c2{inset:31%}
+.radar-circle.c3{inset:46%}
+.radar-cross{position:absolute;background:rgba(200,243,106,.08)}
+.radar-cross.h{left:0;right:0;top:50%;height:1px}
+.radar-cross.v{top:0;bottom:0;left:50%;width:1px}
+.radar-sweep{
+  position:absolute;inset:0;border-radius:50%;
+  background:conic-gradient(from 0deg,rgba(200,243,106,.23),rgba(200,243,106,.03) 44deg,transparent 72deg);
+  animation:spin 6.5s linear infinite;
+}
+.radar-dot{
+  position:absolute;width:4px;height:4px;border-radius:50%;
+  background:var(--red);box-shadow:0 0 0 3px rgba(223,74,47,.12),0 0 8px var(--red);
+}
+.radar-dot.d1{left:61%;top:24%}
+.radar-dot.d2{left:30%;top:39%}
+.radar-dot.d3{left:72%;top:59%}
+.radar-dot.d4{left:46%;top:71%}
+.radar-dot.d5{left:24%;top:57%}
+.radar-core{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;
+  width:67px;height:67px;justify-content:center;
+  border:1px solid rgba(200,243,106,.16);border-radius:50%;
+  background:rgba(9,14,16,.75);backdrop-filter:blur(3px);
+}
+.radar-core b{font-family:var(--mono);font-size:14px;font-weight:500;line-height:1.2;letter-spacing:-.04em}
+.radar-core small{color:#69776f;font-size:7px;margin-top:1px}
+.scan-stats{display:grid;grid-template-columns:1fr 1fr;gap:11px 16px;min-width:0;flex:1}
+.scan-stats>div{display:flex;flex-direction:column;gap:1px}
+.scan-stats span{color:#758078;font-size:8px}
+.scan-stats strong{font-size:19px;font-weight:500;line-height:1.25;font-family:var(--mono)}
+.scan-stats .warn{color:var(--amber)}
+.source-list{position:relative;z-index:1;display:flex;flex-direction:column;border-top:1px solid rgba(255,255,255,.08)}
+.source-item{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.platform{
+  display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;
+  width:34px;height:18px;border-radius:3px;font-size:7px;font-weight:700;
+}
+.platform.douyin{background:rgba(34,211,238,.11);color:#65d2e1}
+.platform.weibo{background:rgba(240,93,64,.11);color:#ee866f}
+.platform.xhs{background:rgba(255,255,255,.08);color:#d8ded6}
+.source-item>div{display:flex;flex-direction:column;min-width:0;gap:0}
+.source-item strong{
+  color:#c6cec5;font-size:9px;font-weight:500;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.source-item small{color:#657068;font-size:7.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sentiment{
+  flex:0 0 auto;margin-left:auto;padding:2px 5px;border-radius:2px;
+  font-size:7px;
+}
+.sentiment.neg{background:rgba(223,74,47,.12);color:#e68672}
+.sentiment.mix{background:rgba(230,161,26,.1);color:#d5ad5a}
+.scan-progress{position:relative;z-index:1;margin-top:auto;padding-top:12px}
+.scan-progress-row{display:flex;justify-content:space-between;gap:10px;color:#6e7971;font-family:var(--mono);font-size:7.5px}
+.scan-progress-row b{color:#a1aba2;font-weight:400}
+.scan-track{height:2px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:6px;overflow:hidden}
+.scan-track i{display:block;height:100%;background:var(--lime);box-shadow:0 0 8px rgba(200,243,106,.4);transition:width .4s}
+.scan-panel.scanning .radar-sweep{animation-duration:1.4s}
+.scan-panel.scanning .radar{box-shadow:inset 0 0 30px rgba(0,0,0,.4),0 0 28px rgba(200,243,106,.1)}
+
+/* =========================================================
+   ANALYSIS
+   ========================================================= */
+.analysis-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(330px,.75fr);gap:18px}
+.level-card{padding:22px 24px 20px}
+.level-list{margin-top:16px;border-top:1px solid var(--line)}
+.level-row{
+  display:grid;grid-template-columns:41px minmax(0,1fr) 65px;
+  gap:13px;align-items:center;
+  min-height:60px;padding:9px 10px;
+  border-bottom:1px solid var(--line);
+  transition:background .2s;
+}
+.level-row:hover{background:#fffdf7}
+.level-row.active{
+  background:linear-gradient(90deg,rgba(230,161,26,.09),transparent 75%);
+  box-shadow:inset 3px 0 0 var(--level-color);
+}
+.level-code{
+  display:inline-flex;align-items:center;gap:5px;
+  color:var(--level-color);
+  font-family:var(--mono);font-size:11px;font-weight:700;
+}
+.level-code::before{content:"";width:4px;height:4px;border-radius:50%;background:var(--level-color)}
+.level-copy{display:flex;flex-direction:column;gap:1px;min-width:0}
+.level-copy strong{font-size:11px;font-weight:600}
+.level-copy span{color:var(--muted-2);font-size:8.5px;line-height:1.5}
+.level-signal{
+  justify-self:end;
+  color:#999284;font-family:var(--mono);font-size:7.5px;
+  white-space:nowrap;text-align:right;
+}
+.level-row.active .level-signal{color:#9a6d0c;font-weight:600}
+.level-foot{
+  display:flex;align-items:flex-start;gap:8px;
+  margin-top:15px;padding:10px 11px;
+  border:1px solid rgba(230,161,26,.25);border-radius:6px;
+  background:rgba(230,161,26,.055);
+  color:#7d725e;font-size:9px;line-height:1.6;
+}
+.level-foot .icon{width:13px;height:13px;color:var(--amber);margin-top:1px}
+.level-foot b{color:#8f6511;font-weight:600}
+.analysis-side{display:flex;flex-direction:column;gap:18px}
+.score-card{padding:22px 22px 19px}
+.dimensions{display:flex;flex-direction:column;gap:11px;margin-top:18px}
+.dim-head{display:flex;justify-content:space-between;align-items:center;font-size:9px;color:#5f5b50}
+.dim-head b{font-family:var(--mono);font-size:9px;color:var(--ink);font-weight:500}
+.dim-track{height:4px;background:#e8e1d3;border-radius:2px;overflow:hidden;margin-top:4px}
+.dim-track i{display:block;height:100%;background:var(--ink);border-radius:2px}
+.dim:nth-child(1) .dim-track i{background:var(--red)}
+.dim:nth-child(2) .dim-track i{background:#d46742}
+.dim:nth-child(3) .dim-track i{background:#b28942}
+.dim:nth-child(4) .dim-track i{background:#7d9070}
+.dim:nth-child(5) .dim-track i{background:#5e786f}
+.score-callout{
+  display:grid;grid-template-columns:94px 1fr;gap:14px;align-items:center;
+  margin-top:19px;padding:13px;
+  border-radius:7px;background:var(--ink);color:#e9ede3;
+}
+.score-callout>div{display:flex;flex-direction:column;border-right:1px solid rgba(255,255,255,.12);padding-right:12px}
+.score-callout span{color:#7e8981;font-size:8px}
+.score-callout strong{font-size:29px;line-height:1.1;font-weight:500;letter-spacing:-.05em}
+.score-callout strong span{font-family:var(--mono);font-size:8px;color:#7e8981;letter-spacing:0;margin-left:2px}
+.score-callout p{color:#aab3ab;font-size:8.5px;line-height:1.65}
+.score-callout b{color:var(--lime);font-weight:500}
+.forecast-card{
+  position:relative;overflow:hidden;
+  padding:18px 20px 16px;
+  border:1px solid #e2c98e;border-radius:var(--radius);
+  background:linear-gradient(135deg,#fbf1d7,#f5e5bf);
+  box-shadow:0 10px 30px rgba(146,110,30,.07);
+}
+.forecast-card::after{
+  content:"";position:absolute;right:-24px;top:-36px;
+  width:120px;height:120px;border:1px solid rgba(151,108,12,.12);
+  border-radius:50%;
+}
+.forecast-top{display:flex;align-items:flex-start;justify-content:space-between}
+.forecast-top>span{color:#7d6a42;font-family:var(--mono);font-size:8px;letter-spacing:.08em}
+.forecast-top strong{font-size:35px;line-height:1;font-weight:500;letter-spacing:-.06em;color:#8c5b05}
+.forecast-top small{font-size:10px;margin-left:1px;color:#a07825}
+.forecast-scale{display:flex;align-items:center;gap:5px;margin:9px 0 10px;color:#9b824d;font-family:var(--mono);font-size:7px}
+.forecast-scale i{flex:1;height:3px;border-radius:2px;background:linear-gradient(90deg,#d8b76f,#c77439,#b54124)}
+.forecast-card p{color:#766442;font-size:9px;line-height:1.65}
+
+.narratives{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:18px}
+.narrative{
+  position:relative;overflow:hidden;
+  padding:20px 20px 17px;
+  border:1px solid var(--line);border-radius:12px;
+  background:var(--paper-2);
+  box-shadow:var(--shadow);
+}
+.narrative::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--narr-color,var(--red))}
+.narrative.fact{--narr-color:#637c88}
+.narrative.public{--narr-color:var(--red)}
+.narrative.strategy{--narr-color:var(--green)}
+.nar-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:13px}
+.nar-head span{color:var(--narr-color);font-family:var(--mono);font-size:8px;font-weight:600;letter-spacing:.08em}
+.nar-head i{font-style:normal;color:#b1aa9c;font-family:var(--mono);font-size:6.5px;letter-spacing:.1em}
+.narrative h3{font-family:var(--serif);font-size:18px;line-height:1.45;letter-spacing:-.03em;font-weight:600}
+.narrative>p{margin-top:11px;color:var(--muted);font-size:9.5px;line-height:1.8}
+.nar-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:15px;padding-top:12px;border-top:1px solid var(--line)}
+.nar-tags span{padding:2px 6px;border-radius:2px;background:var(--paper-3);color:#777163;font-size:7.5px}
+.language-strip{
+  display:grid;grid-template-columns:1fr 1fr;gap:1px;
+  margin-top:14px;overflow:hidden;
+  border:1px solid var(--line);border-radius:10px;
+  background:var(--line);
+}
+.lang-block{padding:13px 16px;background:var(--paper-2)}
+.lang-block.bad{border-left:2px solid var(--red)}
+.lang-block.good{border-left:2px solid var(--green)}
+.lang-label{display:flex;align-items:center;gap:5px;font-size:8px;font-weight:700;letter-spacing:.05em}
+.lang-block.bad .lang-label{color:var(--red)}
+.lang-block.good .lang-label{color:var(--green)}
+.lang-label .icon{width:11px;height:11px}
+.lang-block p{margin-top:4px;color:#5f5a4e;font-size:9.5px;line-height:1.65}
+.lang-block p i{font-style:normal;color:#b9b1a2;margin:0 4px}
+.lang-block.good p{color:#446b5d}
+
+/* =========================================================
+   STRATEGY
+   ========================================================= */
+.strategy-toolbar{
+  display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
+  margin-bottom:13px;padding:11px 14px;
+  border:1px solid var(--line);border-radius:8px;
+  background:rgba(255,255,255,.4);
+}
+.selection-summary{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--muted)}
+.selection-summary b{color:var(--ink);font-family:var(--mono);font-weight:600}
+.selection-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px rgba(76,139,114,.1)}
+.toolbar-divider{width:1px;height:13px;background:var(--line);margin:0 4px}
+.conflict-mini{display:inline-flex;align-items:center;gap:4px;color:var(--green);font-size:9px}
+.conflict-mini .icon{width:11px;height:11px}
+.conflict-mini.warn{color:var(--red)}
+.toolbar-actions{display:flex;align-items:center;gap:14px}
+.strategy-layout{display:grid;grid-template-columns:minmax(0,1fr) 336px;gap:18px;align-items:start}
+.strategy-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.strategy-card{
+  position:relative;
+  padding:17px 17px 14px;
+  border:1px solid var(--line);border-radius:11px;
+  background:var(--paper-2);
+  box-shadow:0 5px 18px rgba(44,34,14,.025);
+  transition:border-color .2s,box-shadow .2s,background .2s;
+}
+.strategy-card:hover{border-color:var(--line-strong)}
+.strategy-card.selected{
+  border-color:#9ba086;
+  background:linear-gradient(160deg,#fffdf4,#f9f7ec);
+  box-shadow:0 0 0 1px rgba(120,130,93,.18),0 9px 22px rgba(44,34,14,.04);
+}
+.strategy-card.selected::after{
+  content:"";position:absolute;left:17px;right:17px;top:0;height:2px;
+  background:linear-gradient(90deg,var(--green),transparent);
+  border-radius:0 0 2px 2px;
+}
+.strategy-card.caution{border-style:dashed}
+.strategy-card.caution.selected{border-style:solid}
+.strategy-card.caution.selected::after{background:linear-gradient(90deg,var(--red),transparent)}
+.strategy-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.strategy-id{display:flex;align-items:center;gap:7px}
+.strategy-id span{font-family:var(--mono);font-size:9px;color:#a69d8b}
+.strategy-id i{font-style:normal;font-family:var(--mono);font-size:7px;letter-spacing:.12em;color:#b9b09e}
+.strategy-badges{display:flex;align-items:center;gap:7px}
+.badge{padding:2px 5px;border-radius:2px;font-size:7px;font-weight:600;letter-spacing:.04em}
+.badge.rec{background:var(--green-soft);color:#356e57}
+.badge.cond{background:var(--paper-3);color:#746c5c}
+.badge.caution{background:var(--red-soft);color:var(--red-deep)}
+.check-wrap{position:relative;display:grid;place-items:center;cursor:pointer}
+.check-wrap input{position:absolute;opacity:0;width:18px;height:18px;cursor:pointer}
+.fake-check{
+  width:17px;height:17px;display:grid;place-items:center;
+  border:1px solid var(--line-strong);border-radius:4px;
+  background:#fffdf8;color:transparent;
+  transition:background .18s,border-color .18s,color .18s;
+}
+.fake-check .icon{width:11px;height:11px;stroke-width:2.5}
+.check-wrap input:checked+.fake-check{background:var(--ink);border-color:var(--ink);color:var(--lime)}
+.check-wrap input:focus-visible+.fake-check{outline:2px solid var(--red);outline-offset:2px}
+.strategy-card h3{font-size:13px;line-height:1.45;font-weight:700;letter-spacing:-.015em;padding-right:4px}
+.strategy-desc{margin-top:7px;color:var(--muted);font-size:9.5px;line-height:1.72;min-height:49px}
+.prob-row{display:flex;justify-content:space-between;align-items:baseline;margin-top:13px;color:#8d8677;font-size:8px}
+.prob-row strong{font-family:var(--mono);font-size:16px;font-weight:500;color:var(--ink);letter-spacing:-.03em}
+.prob-row strong span{font-size:8px;margin-left:1px;color:#8d8677}
+.prob-track{height:3px;margin-top:4px;background:#e8e1d3;border-radius:2px;overflow:hidden}
+.prob-track i{display:block;height:100%;border-radius:2px;background:var(--green);transition:width .4s}
+.strategy-card.caution .prob-track i{background:var(--red)}
+.strategy-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:11px}
+.strategy-tags span{padding:2px 5px;border-radius:2px;background:rgba(230,224,210,.62);color:#7c7567;font-size:7px}
+.resource-toggle{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  margin-top:12px;padding:8px 0 0;
+  border:0;border-top:1px solid var(--line);
+  background:none;color:#80796b;font-size:8px;text-align:left;
+}
+.resource-toggle>span{display:flex;align-items:center;gap:5px}
+.resource-toggle .icon{width:12px;height:12px}
+.resource-toggle .chev{transition:transform .2s}
+.resource-toggle[aria-expanded="true"]{color:var(--ink)}
+.resource-toggle[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.resource-drawer{display:none;margin-top:9px;padding:9px;border:1px solid var(--line);border-radius:5px;background:rgba(255,255,255,.45)}
+.resource-drawer.open{display:block;animation:fadeIn .22s ease}
+.resource-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.resource-grid>div{display:flex;flex-direction:column;gap:1px;padding:6px 7px;border-left:1px solid var(--line)}
+.resource-grid span{color:#9b9384;font-size:7px}
+.resource-grid b{color:#494539;font-size:8px;font-weight:600;line-height:1.4}
+.resource-grid small{color:#8c8475;font-size:7px;line-height:1.45}
+
+.sim-panel{
+  position:sticky;top:82px;
+  padding:20px 19px 16px;
+  border:1px solid #293438;border-radius:var(--radius);
+  color:#e9ede3;
+  background:
+    radial-gradient(circle at 90% 0%,rgba(200,243,106,.075),transparent 30%),
+    linear-gradient(160deg,#151e21,#0e1517);
+  box-shadow:0 16px 36px rgba(18,13,4,.12);
+}
+.sim-head{display:flex;justify-content:space-between;align-items:center;color:#cbd3ca;font-size:10px;font-weight:600}
+.sim-head .mono{color:#5f6b64;font-size:7.5px;font-weight:400;letter-spacing:.08em}
+.sim-score-wrap{display:flex;align-items:center;gap:11px;margin:12px 0 13px}
+.sim-ring{position:relative;width:121px;height:121px;flex:0 0 auto}
+.sim-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.sim-ring-track{fill:none;stroke:rgba(255,255,255,.08);stroke-width:7}
+.sim-ring-value{
+  fill:none;stroke:var(--lime);stroke-width:7;stroke-linecap:round;
+  stroke-dasharray:299 365;
+  filter:drop-shadow(0 0 6px rgba(200,243,106,.22));
+  transition:stroke-dasharray .7s cubic-bezier(.2,.7,.2,1);
+}
+.sim-ring-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:1px}
+.sim-ring-label strong{font-size:33px;font-weight:500;letter-spacing:-.07em;line-height:1}
+.sim-ring-label span{font-family:var(--mono);font-size:9px;color:#7c897f;align-self:center;margin-top:4px}
+.sim-score-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+.sim-score-copy span{color:#aeb8ae;font-size:9px}
+.sim-score-copy small{color:var(--lime);font-family:var(--mono);font-size:7.5px}
+.sim-metrics{
+  display:grid;grid-template-columns:1fr 1fr;gap:1px;
+  overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:5px;
+  background:rgba(255,255,255,.08);
+}
+.sim-metrics>div{display:flex;flex-direction:column;gap:1px;padding:8px 9px;background:#131c1f}
+.sim-metrics span{color:#727f76;font-size:7.5px}
+.sim-metrics strong{color:#e6ebe2;font-size:14px;font-weight:500;letter-spacing:-.03em}
+.sim-metrics small{font-size:8px;color:#89958b;margin-left:1px}
+.sim-sequence{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;padding:8px 9px;border:1px solid rgba(255,255,255,.07);border-radius:5px}
+.sim-sequence>span{color:#748077;font-size:7.5px}
+.sim-sequence>div{display:flex;align-items:center;gap:5px}
+.sim-sequence b{
+  display:grid;place-items:center;width:17px;height:17px;border-radius:3px;
+  background:rgba(200,243,106,.12);color:var(--lime);font-family:var(--mono);font-size:8px;font-weight:500;
+}
+.sim-sequence i{font-style:normal;color:#4e5a53;font-size:8px}
+.sim-narrative{margin-top:11px;color:#9ba69d;font-size:8.5px;line-height:1.72}
+.sim-conflict{
+  display:flex;align-items:flex-start;gap:6px;
+  margin-top:10px;padding:7px 8px;
+  border:1px solid rgba(200,243,106,.13);border-radius:4px;
+  background:rgba(200,243,106,.045);
+  color:#aebfa5;font-size:7.5px;line-height:1.55;
+}
+.sim-conflict .icon{width:11px;height:11px;color:var(--lime);margin-top:1px}
+.sim-conflict.warn{border-color:rgba(223,74,47,.22);background:rgba(223,74,47,.07);color:#d3a296}
+.sim-conflict.warn .icon{color:var(--red)}
+.sim-run{width:100%;margin-top:11px;min-height:38px;font-size:11px}
+.sim-foot{margin-top:8px;text-align:center;color:#59655e;font-family:var(--mono);font-size:7px}
+.sim-disclaimer{margin-top:5px;text-align:center;color:#46524c;font-size:6.5px}
+.sim-panel.pending .sim-head::after{content:"待更新";color:var(--amber);font-size:7px}
+
+.contact-policy{
+  display:flex;align-items:center;gap:12px;
+  margin-top:12px;padding:9px 12px;
+  border:1px solid var(--line);border-radius:7px;
+  background:rgba(255,255,255,.38);
+}
+.contact-policy-label{
+  display:inline-flex;align-items:center;gap:5px;flex:0 0 auto;
+  color:#4f6e61;font-size:8px;font-weight:600;
+}
+.contact-policy-label .icon{width:12px;height:12px}
+.contact-policy p{color:#8c8475;font-size:8.5px;line-height:1.55}
+.contact-policy b{color:#5c574c;font-weight:600}
+.sim-results{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(290px,.72fr);gap:14px;margin-top:14px}
+.chart-card{padding:20px 21px 15px}
+.chart-legend{display:flex;gap:12px;flex-wrap:wrap}
+.chart-legend span{display:flex;align-items:center;gap:4px;color:var(--muted-2);font-size:7px}
+.chart-legend i{width:11px;height:2px;display:inline-block;border-radius:1px}
+.legend-red{background:var(--red);opacity:.65}
+.legend-amber{background:var(--amber)}
+.legend-green{background:var(--green)}
+.line-chart{display:block;width:100%;height:auto;margin-top:8px;overflow:visible}
+.chart-grid line{stroke:#e3dccd;stroke-width:1}
+.chart-labels text{fill:#a39b8b;font-family:var(--mono);font-size:8px}
+.chart-line{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chart-line.baseline{stroke:var(--red);stroke-width:1.4;stroke-dasharray:4 5;opacity:.55}
+.chart-line.statement{stroke:var(--amber);stroke-width:1.5;opacity:.7}
+.chart-line.current{stroke:var(--green);stroke-width:2.6;filter:drop-shadow(0 3px 4px rgba(76,139,114,.12))}
+.chart-area{fill:url(#areaGradient);opacity:.12;stroke:none}
+.chart-today{stroke:#c6beae;stroke-width:1;stroke-dasharray:2 4}
+.chart-today-label{fill:#b0a796;font-family:var(--mono);font-size:6px;letter-spacing:.08em}
+.chart-dot{fill:var(--green);stroke:var(--paper-2);stroke-width:2}
+.chart-callout{
+  margin-top:5px;padding:9px 10px;
+  border-left:2px solid var(--green);border-radius:0 4px 4px 0;
+  background:rgba(76,139,114,.055);
+  color:#81796b;font-size:8.5px;line-height:1.65;
+}
+.chart-callout b{color:#416b5d;font-weight:600}
+.timeline-card{padding:20px 19px 14px}
+.timeline{position:relative;margin-top:16px;padding-left:12px}
+.timeline::before{content:"";position:absolute;left:4px;top:6px;bottom:12px;width:1px;background:var(--line)}
+.timeline-item{position:relative;display:grid;grid-template-columns:48px 1fr;gap:8px;padding-bottom:13px}
+.timeline-item:last-child{padding-bottom:0}
+.timeline-item::before{
+  content:"";position:absolute;left:-11px;top:5px;
+  width:6px;height:6px;border-radius:50%;
+  background:var(--paper-2);border:1px solid var(--green);
+}
+.timeline-item:first-child::before{background:var(--green);box-shadow:0 0 0 3px rgba(76,139,114,.1)}
+.tl-time{color:#a59d8e;font-family:var(--mono);font-size:7px;padding-top:1px}
+.timeline-item b{display:block;font-size:9px;font-weight:600;color:#4e4a40}
+.timeline-item p{margin-top:1px;color:#8d8576;font-size:7.5px;line-height:1.55}
+
+/* =========================================================
+   CASES
+   ========================================================= */
+.case-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.case-card{
+  position:relative;overflow:hidden;
+  padding:23px 23px 20px;
+  border:1px solid var(--line);border-radius:14px;
+  background:var(--paper-2);
+  box-shadow:var(--shadow);
+}
+.case-card::before{content:"";position:absolute;left:0;right:0;top:0;height:4px}
+.case-card.success::before{background:var(--green)}
+.case-card.failure::before{background:var(--red)}
+.case-card.success{background:linear-gradient(170deg,#fbfaf2,#f3f6ee 100%)}
+.case-card.failure{background:linear-gradient(170deg,#fbf8ef,#f8efea 100%)}
+.case-head{display:flex;align-items:flex-start;justify-content:space-between}
+.case-status{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:7.5px;font-weight:600;letter-spacing:.08em}
+.case-status i{width:5px;height:5px;border-radius:50%}
+.success .case-status{color:var(--green)}
+.success .case-status i{background:var(--green);box-shadow:0 0 0 3px rgba(76,139,114,.1)}
+.failure .case-status{color:var(--red)}
+.failure .case-status i{background:var(--red);box-shadow:0 0 0 3px rgba(223,74,47,.1)}
+.case-year{font-family:var(--mono);font-size:9px;color:#afa694;letter-spacing:.08em}
+.case-title-row{display:flex;align-items:center;gap:12px;margin-top:17px}
+.case-glyph{
+  width:47px;height:47px;flex:0 0 auto;
+  display:grid;place-items:center;
+  border:1px solid var(--line);border-radius:7px;
+  background:rgba(255,255,255,.5);
+  font-family:var(--serif);font-size:23px;color:#49463b;
+}
+.success .case-glyph{border-color:#c7d7c8;background:#eef4e8;color:#436d59}
+.failure .case-glyph{border-color:#e5c6ba;background:#faeee8;color:#a8482d}
+.case-title-row h3{font-family:var(--serif);font-size:21px;line-height:1.3;font-weight:600;letter-spacing:-.03em}
+.case-title-row p{margin-top:2px;color:var(--muted-2);font-size:8.5px}
+.case-lede{margin-top:15px;color:#5f5a4e;font-size:10px;line-height:1.8}
+.case-timeline{display:flex;flex-direction:column;gap:0;margin-top:17px;border-top:1px solid var(--line)}
+.case-timeline>div{display:grid;grid-template-columns:23px 55px 1fr;gap:8px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--line)}
+.case-timeline span{font-family:var(--mono);font-size:7px;color:#b0a797}
+.case-timeline b{font-size:9px;font-weight:600;color:#4d493f}
+.case-timeline p{color:#877f70;font-size:8px;line-height:1.55}
+.case-verdict{margin-top:14px;padding:11px 12px;border-left:2px solid var(--green);border-radius:0 5px 5px 0;background:rgba(76,139,114,.055)}
+.failure .case-verdict{border-left-color:var(--red);background:rgba(223,74,47,.045)}
+.case-verdict span{display:block;margin-bottom:3px;font-family:var(--mono);font-size:7px;font-weight:600;letter-spacing:.08em;color:var(--green)}
+.failure .case-verdict span{color:var(--red)}
+.case-verdict p{color:#726b5c;font-size:8.5px;line-height:1.7}
+.case-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:13px}
+.case-tags span{padding:2px 6px;border:1px solid var(--line);border-radius:2px;color:#877f70;font-size:7px}
+.case-contrast{
+  display:flex;align-items:center;gap:15px;
+  margin-top:14px;padding:14px 17px;
+  border:1px solid var(--line);border-radius:8px;
+  background:rgba(255,255,255,.4);
+}
+.contrast-label{flex:0 0 auto;padding:3px 6px;border-radius:2px;background:var(--ink);color:var(--lime);font-family:var(--mono);font-size:7px;letter-spacing:.06em}
+.case-contrast p{flex:1;color:#746d5f;font-size:9px;line-height:1.65}
+.case-contrast strong{color:var(--ink);font-weight:600}
+.case-contrast a{display:inline-flex;align-items:center;gap:5px;flex:0 0 auto;color:var(--ink);font-size:8px;border-bottom:1px solid var(--ink);padding-bottom:1px}
+.case-contrast a .icon{width:11px;height:11px}
+
+/* =========================================================
+   SUMMARY
+   ========================================================= */
+.summary-card{
+  position:relative;overflow:hidden;
+  display:grid;grid-template-columns:minmax(300px,.72fr) minmax(0,1.28fr);
+  gap:34px;
+  padding:37px 39px;
+  border-radius:18px;
+  background:
+    radial-gradient(circle at 5% 100%,rgba(200,243,106,.09),transparent 27%),
+    radial-gradient(circle at 98% 0%,rgba(223,74,47,.13),transparent 24%),
+    linear-gradient(125deg,#111a1d,#0c1214 68%,#12180f);
+  box-shadow:0 22px 55px rgba(22,16,5,.15);
+  color:#edf0e6;
+}
+.summary-card::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:64px 64px;
+  mask-image:linear-gradient(90deg,rgba(0,0,0,.65),transparent 75%);
+  -webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,.65),transparent 75%);
+}
+.summary-left{position:relative;z-index:1;display:flex;flex-direction:column;align-items:flex-start}
+.summary-left h2{
+  margin-top:13px;
+  font-family:var(--serif);font-size:clamp(38px,4vw,54px);
+  line-height:1.12;font-weight:600;letter-spacing:-.055em;
+}
+.summary-left h2 em{color:var(--lime);font-style:italic;font-weight:500}
+.summary-left>p:not(.eyebrow){max-width:300px;margin-top:18px;color:#98a29a;font-size:10.5px;line-height:1.85}
+.summary-left .btn{margin-top:auto}
+.summary-right{position:relative;z-index:1;min-width:0}
+.summary-list{border-top:1px solid rgba(255,255,255,.13)}
+.summary-list li{display:grid;grid-template-columns:33px 1fr;gap:12px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.1)}
+.summary-list li>span{font-family:var(--mono);font-size:9px;color:var(--lime);padding-top:3px}
+.summary-list b{display:block;color:#e6ebe2;font-size:10.5px;font-weight:600;line-height:1.5}
+.summary-list p{margin-top:2px;color:#8e9991;font-size:8.5px;line-height:1.65}
+.summary-foot{display:flex;justify-content:space-between;gap:10px;margin-top:13px;color:#58635c;font-size:7px}
+.summary-foot .mono{letter-spacing:.06em}
+
+/* =========================================================
+   PROMPT
+   ========================================================= */
+.prompt-layout{display:grid;grid-template-columns:minmax(230px,.52fr) minmax(0,1.48fr);gap:30px;align-items:start}
+.prompt-intro{position:sticky;top:92px;padding-top:4px}
+.prompt-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border:1px solid #bcd86d;border-radius:99px;color:#61752a;font-family:var(--mono);font-size:7px;letter-spacing:.07em}
+.prompt-badge .icon{width:11px;height:11px}
+.prompt-intro h3{font-family:var(--serif);font-size:30px;line-height:1.4;font-weight:600;letter-spacing:-.04em;margin-top:16px}
+.prompt-intro ul{margin-top:19px;border-top:1px solid var(--line)}
+.prompt-intro li{display:grid;grid-template-columns:25px 1fr;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);color:#5f5a4e;font-size:9px}
+.prompt-intro li span{font-family:var(--mono);font-size:7px;color:var(--red)}
+.prompt-tip{margin-top:14px;color:var(--muted-2);font-size:8px;line-height:1.65}
+.prompt-tip code{font-family:var(--mono);background:var(--paper-3);padding:1px 4px;border-radius:2px;color:#6a5d45}
+.prompt-terminal{
+  overflow:hidden;
+  border:1px solid #253135;border-radius:12px;
+  background:#0e1518;
+  box-shadow:0 18px 45px rgba(18,13,4,.12);
+}
+.terminal-top{display:flex;align-items:center;gap:14px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02)}
+.terminal-dots{display:flex;gap:4px;flex:0 0 auto}
+.terminal-dots i{width:5px;height:5px;border-radius:50%;background:#4e5b55}
+.terminal-dots i:first-child{background:var(--red)}
+.terminal-dots i:nth-child(2){background:var(--amber)}
+.terminal-dots i:nth-child(3){background:var(--green)}
+.prompt-tabs{display:flex;align-items:center;gap:1px;flex-wrap:wrap}
+.prompt-tab{
+  padding:4px 8px;border:1px solid transparent;border-radius:3px;
+  background:none;color:#6f7b73;font-family:var(--mono);font-size:7.5px;
+}
+.prompt-tab:hover{color:#c5cec5}
+.prompt-tab.active{color:var(--lime);background:rgba(200,243,106,.07);border-color:rgba(200,243,106,.13)}
+.prompt-code{
+  min-height:280px;max-height:355px;overflow:auto;
+  margin:0;padding:20px 22px;
+  color:#b9c3b9;font-family:var(--mono);font-size:9px;line-height:1.9;
+  white-space:pre-wrap;word-break:break-word;
+  tab-size:2;
+}
+.prompt-code::-webkit-scrollbar{width:4px}
+.prompt-code::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16)}
+.prompt-code .p-dim{color:#637169}
+.prompt-code .p-key{color:var(--lime)}
+.prompt-code .p-str{color:#d9b36b}
+.terminal-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 14px;border-top:1px solid rgba(255,255,255,.08)}
+.terminal-foot>span{color:#59655e;font-family:var(--mono);font-size:7px}
+.copy-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 9px;border:1px solid rgba(200,243,106,.24);border-radius:4px;background:rgba(200,243,106,.08);color:var(--lime);font-size:8px}
+.copy-btn:hover{background:rgba(200,243,106,.14)}
+.copy-btn .icon{width:11px;height:11px}
+
+/* =========================================================
+   PARTNERS
+   ========================================================= */
+.filter-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.filter{padding:5px 10px;border:1px solid var(--line);border-radius:99px;background:transparent;color:var(--muted);font-size:8.5px}
+.filter:hover{border-color:var(--line-strong)}
+.filter.active{background:var(--ink);border-color:var(--ink);color:#f4f0e4}
+.filter-count{margin-left:auto;color:var(--muted-2);font-family:var(--mono);font-size:8px}
+.agency-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.agency-card{
+  display:flex;flex-direction:column;
+  padding:17px 17px 14px;
+  border:1px solid var(--line);border-radius:10px;
+  background:var(--paper-2);
+  box-shadow:0 5px 18px rgba(44,34,14,.025);
+  transition:transform .2s,border-color .2s,box-shadow .2s;
+}
+.agency-card:hover{transform:translateY(-2px);border-color:var(--line-strong);box-shadow:0 10px 24px rgba(44,34,14,.055)}
+.agency-card.hidden{display:none}
+.agency-top{display:flex;justify-content:space-between;align-items:center}
+.agency-logo{
+  display:grid;place-items:center;width:31px;height:31px;
+  border-radius:4px;background:var(--ink);color:var(--lime);
+  font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.04em;
+}
+.agency-type{padding:2px 5px;border-radius:2px;background:var(--paper-3);color:#847b6b;font-size:7px}
+.agency-card h3{margin-top:13px;font-family:var(--serif);font-size:17px;line-height:1.3;font-weight:600;letter-spacing:-.02em}
+.agency-card h3 small{font-family:var(--sans);font-size:8px;color:var(--muted-2);font-weight:400;margin-left:5px;letter-spacing:0}
+.agency-card>p{margin-top:7px;color:var(--muted);font-size:8.5px;line-height:1.7;min-height:43px}
+.agency-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:11px}
+.agency-tags span{padding:2px 5px;border:1px solid var(--line);border-radius:2px;color:#847c6d;font-size:6.5px}
+.agency-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:13px;padding-top:10px;border-top:1px solid var(--line)}
+.agency-foot>span{color:#9e9687;font-size:7px}
+.agency-foot a{display:inline-flex;align-items:center;gap:3px;color:#5f5a4e;font-size:7.5px;border-bottom:1px solid #bdb4a2;padding-bottom:1px}
+.agency-foot a:hover{color:var(--red);border-color:var(--red)}
+.agency-foot .icon{width:9px;height:9px}
+
+.network-strip{
+  display:grid;grid-template-columns:200px minmax(0,1fr);gap:25px;
+  margin-top:24px;padding:25px 26px;
+  border-radius:14px;color:#e9ede3;
+  background:linear-gradient(140deg,#141d20,#0d1416);
+  box-shadow:0 16px 36px rgba(18,13,4,.1);
+}
+.network-head h3{margin-top:8px;font-family:var(--serif);font-size:23px;line-height:1.4;font-weight:600;letter-spacing:-.035em}
+.network-nodes{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid rgba(255,255,255,.09);border-left:1px solid rgba(255,255,255,.09)}
+.network-node{display:flex;flex-direction:column;padding:12px 13px;border-right:1px solid rgba(255,255,255,.09);border-bottom:1px solid rgba(255,255,255,.09)}
+.node-status{display:flex;align-items:center;gap:4px;color:#6f7a72;font-family:var(--mono);font-size:6.5px}
+.node-status i{width:3px;height:3px;border-radius:50%;background:#6a756e}
+.network-node.connected .node-status{color:var(--lime)}
+.network-node.connected .node-status i{background:var(--lime);box-shadow:0 0 5px var(--lime)}
+.network-node b{margin-top:5px;font-size:9px;font-weight:600;color:#d7ded5}
+.network-node small{margin-top:2px;color:#6f7b73;font-size:7px;line-height:1.55}
+
+/* =========================================================
+   FOOTER / TOAST
+   ========================================================= */
+.footer{
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  margin-top:64px;padding:20px 30px 26px;
+  border-top:1px solid var(--line);
+  color:var(--muted-2);font-size:7.5px;
+}
+.footer-brand{display:flex;align-items:center;gap:7px;color:var(--ink);font-family:var(--mono);font-size:9px;letter-spacing:.08em}
+.footer-brand>span:last-child{color:var(--muted-2);font-family:var(--sans);font-size:7px;letter-spacing:0}
+.footer p{flex:1;min-width:280px;line-height:1.6}
+.footer-links{display:flex;gap:10px;font-family:var(--mono);font-size:7px}
+.footer-links a{border-bottom:1px solid transparent}
+.footer-links a:hover{color:var(--ink);border-color:var(--ink)}
+.toast{
+  position:fixed;right:22px;bottom:22px;z-index:80;
+  display:flex;align-items:center;gap:8px;
+  max-width:330px;padding:10px 14px;
+  border:1px solid rgba(200,243,106,.25);border-radius:7px;
+  background:#11191c;color:#e9ede3;
+  box-shadow:0 14px 34px rgba(0,0,0,.22);
+  font-size:9px;
+  opacity:0;transform:translateY(12px);pointer-events:none;
+  transition:opacity .24s,transform .24s;
+}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast .icon{width:14px;height:14px;color:var(--lime)}
+
+/* =========================================================
+   READABILITY PASS
+   Small editorial labels stay compact; decision-critical copy
+   is kept at a legible size for presentation screens.
+   ========================================================= */
+.section-title>p:last-child{font-size:13.5px}
+.card-label{font-size:12px}
+.micro-note{font-size:9.5px}
+.level-copy strong{font-size:12px}
+.level-copy span{font-size:9.5px}
+.level-signal{font-size:8px}
+.score-callout p{font-size:9.5px}
+.dim-head{font-size:10px}
+.forecast-top>span{font-size:9px}
+.forecast-card p{font-size:10px}
+.narrative>p{font-size:10.5px}
+.nar-tags span{font-size:8px}
+.lang-block p{font-size:10.5px}
+.dropzone strong{font-size:11px}
+.dropzone small{font-size:9px}
+.drop-action{font-size:9px}
+.tag-chip{font-size:10px}
+.tag-input input{font-size:10px}
+.channel{font-size:9px}
+.textarea-foot{font-size:10px}
+.source-item strong{font-size:10px}
+.source-item small{font-size:8.5px}
+.scan-stats span{font-size:9px}
+.scan-progress-row{font-size:8px}
+.strategy-card h3{font-size:14px}
+.strategy-desc{font-size:11.4px;line-height:1.72;min-height:58px}
+.badge{font-size:8px}
+.strategy-id span{font-size:10px}
+.strategy-id i{font-size:8px}
+.prob-row{font-size:9px}
+.strategy-tags span{font-size:8px}
+.resource-toggle{font-size:9px}
+.resource-grid span{font-size:8px}
+.resource-grid b{font-size:10px}
+.resource-grid small{font-size:8.6px;line-height:1.55}
+.sim-score-copy span{font-size:10px}
+.sim-score-copy small{font-size:8.5px}
+.sim-metrics span{font-size:8.5px}
+.sim-metrics strong{font-size:15px}
+.sim-sequence>span{font-size:8.5px}
+.sim-narrative{font-size:9.2px}
+.sim-conflict{font-size:8.5px}
+.sim-foot{font-size:7.5px}
+.sim-disclaimer{font-size:7px}
+.chart-legend span{font-size:8px}
+.chart-callout{font-size:9.5px}
+.timeline-item b{font-size:10px}
+.timeline-item p{font-size:8.5px}
+.tl-time{font-size:8px}
+.case-title-row p{font-size:9.5px}
+.case-lede{font-size:11px}
+.case-timeline b{font-size:10px}
+.case-timeline p{font-size:9px}
+.case-verdict p{font-size:9.5px}
+.case-tags span{font-size:8px}
+.summary-list b{font-size:11.5px}
+.summary-list p{font-size:9.5px}
+.summary-left>p:not(.eyebrow){font-size:11.5px}
+.summary-foot{font-size:8px}
+.prompt-intro li{font-size:10px}
+.prompt-tip{font-size:9px}
+.prompt-code{font-size:10px}
+.prompt-tab{font-size:8.5px}
+.terminal-foot>span{font-size:8px}
+.agency-card>p{font-size:9.8px}
+.agency-card h3 small{font-size:9px}
+.agency-tags span{font-size:7.5px}
+.agency-foot>span{font-size:8px}
+.agency-foot a{font-size:8.5px}
+.filter{font-size:9.5px}
+.network-node b{font-size:10px}
+.network-node small{font-size:8px}
+.node-status{font-size:7.5px}
+
+.followup-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+@media (max-width:900px){.followup-grid{grid-template-columns:1fr}}
+.followup-chat,.followup-plan{padding:19px 20px}
+.chat-thread{display:flex;flex-direction:column;gap:9px;min-height:104px;max-height:250px;overflow:auto;margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--paper-3)}
+.chat-empty{align-self:center;margin:auto;color:var(--muted-2);font-size:11px;text-align:center}
+.chat-entry{align-self:flex-end;max-width:92%;padding:9px 12px;border:1px solid #d9e4c3;border-radius:9px 9px 2px 9px;background:#f0f6e5}
+.chat-entry small{display:block;margin-bottom:3px;color:var(--muted-2);font-size:9px}
+.chat-entry p{color:var(--ink);font-size:11px;white-space:pre-wrap;overflow-wrap:anywhere}
+.chat-entry.restored{align-self:stretch;max-width:none}
+.followup-field{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.followup-field>span{font-size:10px;color:var(--muted);font-weight:600}
+.followup-field textarea{width:100%;min-height:82px;padding:10px 11px;border:1px solid var(--line);border-radius:7px;background:#fffdf8;font-size:11px;resize:vertical}
+.followup-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}
+.followup-actions .btn{min-height:35px;padding:7px 11px;font-size:10px}
+.plan-intro{margin:12px 0;color:var(--muted);font-size:11px}
+.action-list{display:flex;flex-direction:column;gap:8px;margin:12px 0;padding:0;list-style:none}
+.action-list li{display:flex;gap:10px;padding:10px;border:1px solid var(--line);border-radius:7px;background:var(--paper-3)}
+.action-list li>span{color:var(--red);font:10px var(--mono)}
+.action-list li div{display:flex;flex-direction:column;gap:2px}
+.action-list b{font-size:11px}
+.action-list small{color:var(--muted);font-size:9px;line-height:1.55}
+.strategy-empty{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:22px}
+.strategy-empty>p{max-width:720px;color:var(--muted);font-size:12px}
+#strategy .strategy-toolbar,#strategy .strategy-layout,#strategy .contact-policy,#strategy .sim-results{display:none!important}
+.scan-note{max-width:340px}
+#eventHelp{display:block;margin-top:5px;color:var(--muted-2);font-size:9px;line-height:1.5}
+.dataset-workspace{display:flex;flex-direction:column;gap:12px}
+.dataset-gate{display:flex;align-items:center;gap:12px;padding:16px 18px;border:1px solid var(--line);border-radius:9px;background:var(--paper-2)}
+.dataset-step{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--lime);font:11px var(--mono)}
+.dataset-gate>div{display:flex;flex-direction:column;gap:3px}.dataset-gate b{font-size:11px}.dataset-gate small{color:var(--muted);font-size:10px}
+.dataset-workspace.ready .dataset-gate{border-color:#c5d6a1;background:#f5f8ec}
+.dataset-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dataset-toolbar>span{color:var(--muted);font-size:10px}
+.dataset-upload{display:inline-flex;align-items:center;cursor:pointer}
+.dataset-upload input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.dataset-upload span{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:7px 13px;border:1px solid var(--ink);border-radius:7px;background:var(--ink);color:#f4f0e4;font-size:10px;font-weight:600}
+.dataset-upload:has(input:disabled){cursor:not-allowed;opacity:.5}
+.dataset-upload input:focus-visible+span{outline:2px solid var(--red);outline-offset:3px}
+.dataset-filter{min-height:36px;min-width:190px;padding:7px 10px;border:1px solid var(--line);border-radius:7px;background:var(--paper-2);font-size:10px}
+.dataset-items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.dataset-empty{grid-column:1/-1;padding:18px;border:1px dashed var(--line-strong);border-radius:8px;color:var(--muted-2);font-size:10px;text-align:center}
+.dataset-option{display:flex;align-items:flex-start;gap:9px;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:var(--paper-2);cursor:pointer}
+.dataset-option:has(input:checked){border-color:#899b68;background:#f4f7eb}
+.dataset-option input{margin-top:2px;accent-color:var(--green)}
+.dataset-option span{display:flex;flex-direction:column;gap:3px;min-width:0}
+.dataset-option b{font-size:10px;overflow-wrap:anywhere}.dataset-option small{color:var(--muted);font-size:9px;overflow-wrap:anywhere}
+.dataset-compare{min-height:92px;overflow:auto;padding:14px;border:1px solid var(--line);border-radius:8px;background:var(--paper-2)}
+.dataset-compare>b{font-size:11px}.dataset-compare>p{margin-top:5px;color:var(--muted);font-size:10px}
+.dataset-compare table{width:100%;margin-top:10px;border-collapse:collapse;font-size:9px}
+.dataset-compare th,.dataset-compare td{padding:7px 8px;border:1px solid var(--line);text-align:left;vertical-align:top;overflow-wrap:anywhere}
+.dataset-compare th{background:var(--paper-3);font-weight:600}
+@media (max-width:650px){.dataset-items{grid-template-columns:1fr}.dataset-toolbar>span{width:100%}.dataset-filter{flex:1;min-width:0}}
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.001ms!important}
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width:1240px){
+  :root{--sidebar:214px}
+  .hero{padding:34px 32px 0}
+  .hero-grid{gap:30px}
+  .hero h1{font-size:45px}
+  .strategy-layout{grid-template-columns:minmax(0,1fr) 310px}
+  .agency-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:1100px){
+  :root{--sidebar:0px}
+  .sidebar{
+    width:252px;transform:translateX(-102%);
+    transition:transform .25s ease;
+  }
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-scrim{
+    display:block;position:fixed;inset:0;z-index:35;
+    background:rgba(9,12,12,.42);opacity:0;pointer-events:none;transition:opacity .25s;
+  }
+  .sidebar-scrim.show{opacity:1;pointer-events:auto}
+  .mobile-menu{display:grid}
+  .app{margin-left:0}
+  .topbar{padding:0 22px}
+  main{padding:20px 22px 0}
+  .hero h1{font-size:42px}
+  .strategy-layout{grid-template-columns:1fr}
+  .sim-panel{position:relative;top:auto}
+  .agency-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media (max-width:900px){
+  .hero-grid{grid-template-columns:1fr}
+  .hero-side{justify-self:start;max-width:100%;display:grid;grid-template-columns:218px 1fr;gap:14px;align-items:center;width:100%;padding-top:0}
+  .risk-ring-wrap{grid-row:span 2}
+  .hero-level{margin:0}
+  .hero-metrics{margin-top:0}
+  .hero-ticker{margin-top:27px;gap:18px;overflow-x:auto;padding-bottom:14px}
+  .ticker-live{margin-left:0}
+  .input-grid,.analysis-grid{grid-template-columns:1fr}
+  .scan-panel{min-height:390px}
+  .narratives{grid-template-columns:1fr}
+  .narrative h3{font-size:20px}
+  .strategy-grid{grid-template-columns:1fr}
+  .strategy-desc{min-height:0}
+  .sim-results{grid-template-columns:1fr}
+  .case-grid{grid-template-columns:1fr}
+  .summary-card{grid-template-columns:1fr;padding:30px}
+  .summary-left .btn{margin-top:24px}
+  .summary-left>p:not(.eyebrow){max-width:500px}
+  .prompt-layout{grid-template-columns:1fr;gap:20px}
+  .prompt-intro{position:relative;top:auto}
+  .prompt-intro h3 br{display:none}
+  .network-strip{grid-template-columns:1fr;gap:18px}
+  .network-nodes{grid-template-columns:repeat(2,1fr)}
+  .agency-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:720px){
+  .topbar{height:58px;padding:0 15px;gap:10px}
+  .crumb{display:none}
+  .demo-pill{display:none}
+  .icon-btn{display:none}
+  .top-actions{gap:7px}
+  main{padding:15px 14px 0}
+  .hero{padding:26px 20px 0;border-radius:15px}
+  .hero h1{font-size:33px;line-height:1.2}
+  .hero-lede{font-size:12px;line-height:1.8}
+  .hero-brief{display:block;padding:13px 14px}
+  .brief-label{margin-bottom:5px}
+  .hero-actions{flex-direction:column;align-items:stretch}
+  .hero-actions .btn{width:100%}
+  .hero-side{grid-template-columns:1fr;justify-items:start}
+  .risk-ring-wrap{grid-row:auto;width:180px;height:180px;margin:0 auto}
+  .risk-ring-content strong{font-size:46px}
+  .hero-level{width:100%}
+  .hero-metrics{width:100%}
+  .hero-ticker{font-size:7px;gap:14px;padding-bottom:12px}
+  .hero::after{font-size:110px;right:12px;bottom:70px}
+  .section{padding-top:58px}
+  .section-head{grid-template-columns:1fr;gap:10px;margin-bottom:20px}
+  .section-index{flex-direction:row;align-items:center;gap:8px}
+  .section-index i{width:22px}
+  .section-title h2{font-size:29px}
+  .section-note{display:none}
+  .desktop-break{display:none}
+  .input-card{padding:18px 16px}
+  .input-split{grid-template-columns:1fr}
+  .scan-panel{padding:18px 16px;min-height:0}
+  .radar-wrap{gap:16px}
+  .radar{width:125px;height:125px}
+  .radar-core{width:59px;height:59px}
+  .radar-core b{font-size:12px}
+  .level-card,.score-card{padding:18px 16px}
+  .level-row{grid-template-columns:36px 1fr;gap:9px;padding:9px 8px}
+  .level-signal{display:none}
+  .language-strip{grid-template-columns:1fr}
+  .strategy-toolbar{align-items:flex-start}
+  .toolbar-actions{margin-left:0}
+  .strategy-grid{grid-template-columns:1fr}
+  .sim-panel{padding:18px 16px}
+  .contact-policy{align-items:flex-start;flex-direction:column;gap:4px}
+  .chart-card,.timeline-card{padding:17px 15px}
+  .chart-legend{gap:7px}
+  .case-card{padding:19px 16px}
+  .case-title-row h3{font-size:18px}
+  .case-contrast{align-items:flex-start;flex-wrap:wrap}
+  .case-contrast p{flex-basis:calc(100% - 75px)}
+  .summary-card{padding:24px 18px}
+  .summary-left h2{font-size:38px}
+  .summary-foot{flex-direction:column;gap:4px}
+  .prompt-code{min-height:250px;padding:16px;font-size:8px}
+  .terminal-top{align-items:flex-start;gap:8px}
+  .prompt-tabs{gap:2px}
+  .agency-grid{grid-template-columns:1fr}
+  .network-strip{padding:20px 16px}
+  .network-nodes{grid-template-columns:1fr 1fr}
+  .filter-count{margin-left:0}
+  .footer{padding:18px 14px 24px;margin-top:48px}
+  .footer p{min-width:100%}
+}
+@media (max-width:430px){
+  .hero h1{font-size:29px}
+  .risk-ring-wrap{width:164px;height:164px}
+  .risk-ring-content strong{font-size:42px}
+  .scan-stats strong{font-size:17px}
+  .resource-grid{grid-template-columns:1fr}
+  .sim-metrics{grid-template-columns:1fr 1fr}
+  .network-nodes{grid-template-columns:1fr}
+  .agency-foot{flex-wrap:wrap}
+}
+
+</style>
+</head>
+<body>
+  <svg class="svg-sprite" aria-hidden="true">
+    <symbol id="i-radar" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="M12 12 19 7"/><circle cx="12" cy="12" r="1"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
+    <symbol id="i-video" viewBox="0 0 24 24"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m0 0-6-6m6 6-6 6"/></symbol>
+    <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="M7 17 17 7m0 0H8m9 0v9"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M10 14 20 4"/><path d="M20 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11m0 0 4-4m-4 4-4-4"/><path d="M5 19h14"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 4.2 2.8 17a2 2 0 0 0 1.7 3h15a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4m0 3h.01"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-building" viewBox="0 0 24 24"><path d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16M16 9h2a2 2 0 0 1 2 2v10M8 7h4M8 11h4M8 15h4M8 19h4"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.4 19.4 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2Z"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18Z"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+    <symbol id="i-scale" viewBox="0 0 24 24"><path d="m12 3 8 4H4l8-4ZM12 7v14M7 21h10"/><path d="m4 8-2 6a3 3 0 0 0 6 0L6 8M20 8l2 6a3 3 0 0 1-6 0l2-6"/></symbol>
+    <symbol id="i-snow" viewBox="0 0 24 24"><path d="M12 2v20M4.2 6.5l15.6 11M4.2 17.5l15.6-11M9 4l3 3 3-3M9 20l3-3 3 3M4.5 9 8 10l1-3M19.5 15 16 14l-1 3M19.5 9 16 10l-1-3M4.5 15 8 14l1 3"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h10M18 18h2"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="18" r="2"/></symbol>
+  </svg>
+
+  <div class="sidebar-scrim" id="sidebarScrim"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="#top" aria-label="PRISM 首页">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="brand-type"><strong>PRISM</strong><small>危机公关处理器</small></span>
+    </a>
+
+    <div class="side-case">
+      <span class="side-label">CURRENT WORKSPACE</span>
+      <p id="workspaceTitle">新建事件研判</p>
+      <div class="side-case-meta">
+        <span class="side-level" id="sideLevel">—</span>
+        <span id="sideLevelName">等待输入</span>
+        <span class="side-pulse"></span>
+      </div>
+    </div>
+
+    <nav class="side-nav" aria-label="页面导航">
+      <a href="#top" class="active"><span>00</span>态势总览</a>
+      <a href="#input"><span>01</span>输入与采集</a>
+      <a href="#analysis"><span>02</span>研判与定级</a>
+          <a href="#followup"><span>03</span>对话与处置</a>
+          <a href="#strategy"><span>04</span>策略工作区</a>
+          <a href="#cases"><span>05</span>案例数据对照</a>
+          <a href="#summary"><span>06</span>决策摘要</a>
+          <a href="#prompt"><span>07</span>AI 提示词</a>
+          <a href="#partners"><span>08</span>公关数据比较</a>
+    </nav>
+
+    <div class="side-bottom">
+      <div class="side-progress">
+        <div class="side-progress-head"><span>研判进度</span><b id="progressLabel">0%</b></div>
+        <div class="side-progress-track"><i id="progressBar" style="width:0%"></i></div>
+        <p id="progressHint">输入事件情况后开始</p>
+      </div>
+      <div class="side-status">
+        <span><i class="status-dot"></i>SYSTEM READY</span>
+        <span class="mono">LOCAL 0.1</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="app">
+    <header class="topbar">
+      <button class="mobile-menu" id="mobileMenu" aria-label="打开导航"><svg class="icon"><use href="#i-menu"/></svg></button>
+      <div class="crumb">
+        <span>工作台</span><i>/</i><span>事件研判</span><i>/</i><strong id="crumbTitle">新建事件</strong>
+      </div>
+      <div class="top-actions">
+        <span class="demo-pill"><i></i>本地研判工作台</span>
+        <button class="icon-btn" id="newCaseBtn" aria-label="新建推演" title="新建推演"><svg class="icon"><use href="#i-plus"/></svg></button>
+        <button class="btn btn-outline btn-sm export-trigger"><svg class="icon"><use href="#i-download"/></svg>导出简报</button>
+        <span class="avatar" title="演示用户">M</span>
+      </div>
+    </header>
+
+    <main>
+      <!-- HERO -->
+      <section class="hero" id="top">
+        <div class="hero-grid">
+          <div class="hero-main">
+            <div class="case-kicker"><span>PRISM WORKSPACE</span><i></i><span>事件识别与响应</span><i></i><span>等待输入</span></div>
+            <h1>先厘清正在发生什么，<br>再决定 <em>如何应对</em>。</h1>
+            <p class="hero-lede">描述你遇到的情况。系统将协助整理风险信号、初步判断等级，并为后续处置留出工作区。</p>
+
+            <div class="hero-brief">
+              <div class="brief-label"><svg class="icon"><use href="#i-spark"/></svg>初步态势判断</div>
+              <p id="heroBriefText">这里会显示基于你输入内容的初步态势摘要。未输入事件前，不预设事件类型、风险或处置结论。</p>
+            </div>
+
+            <div class="hero-actions">
+              <a class="btn btn-lime" href="#followup">进入后续处理<svg class="icon"><use href="#i-arrow"/></svg></a>
+              <a class="btn btn-ghost" href="#analysis">查看研判依据</a>
+            </div>
+          </div>
+
+          <div class="hero-side">
+            <div class="risk-ring-wrap">
+              <svg class="risk-ring" viewBox="0 0 220 220" aria-label="等待事件研判">
+                <circle class="ring-track" cx="110" cy="110" r="86"/>
+                <circle class="ring-ticks" cx="110" cy="110" r="97"/>
+                <circle class="ring-value" cx="110" cy="110" r="86" id="heroRing" stroke-dasharray="0 541"/>
+                <circle cx="110" cy="24" r="2.2" class="ring-dot"/>
+                <circle cx="196" cy="110" r="2.2" class="ring-dot"/>
+                <circle cx="110" cy="196" r="2.2" class="ring-dot"/>
+                <circle cx="24" cy="110" r="2.2" class="ring-dot"/>
+              </svg>
+              <div class="risk-ring-content">
+                <span class="risk-label">RISK SCORE</span>
+              <strong id="heroRiskScore">—</strong>
+                <span class="risk-total">/ 100</span>
+              </div>
+            </div>
+            <div class="hero-level">
+              <span class="level-tag" id="heroLevelCode">—</span>
+              <div><strong id="heroLevelName">等待研判</strong><small id="heroLevelAction">输入事件描述后生成初步结果</small></div>
+            </div>
+            <div class="hero-metrics">
+              <div><span>识别信号</span><strong id="signalCount">—</strong></div>
+              <div><span>待确认项</span><strong id="unknownCount">—</strong></div>
+              <div><span>建议响应</span><strong id="responseLevel">—</strong></div>
+              <div><span>研判状态</span><strong id="assessmentState">待输入</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-ticker" aria-label="实时指标">
+          <span><b>01</b> 描述事件</span>
+          <span><b>02</b> 核实关键事实</span>
+          <span><b>03</b> 选择后续动作</span>
+          <span class="ticker-live"><i></i>READY</span>
+        </div>
+      </section>
+
+      <!-- INPUT -->
+      <section class="section" id="input">
+        <div class="section-head">
+          <div class="section-index"><span>01</span><i></i></div>
+          <div class="section-title">
+            <p class="eyebrow">INGEST &amp; RETRIEVE</p>
+            <h2>从一条线索开始。</h2>
+            <p>描述事件经过、涉及对象、已知影响和已经采取的行动。先记录事实与未知项，再进行初步风险判断。</p>
+          </div>
+          <div class="section-note"><span>MODULE 01</span>事件描述<br>本地文本研判</div>
+        </div>
+
+        <div class="input-grid">
+          <div class="card input-card">
+            <div class="card-topline">
+              <span class="card-label"><svg class="icon"><use href="#i-file"/></svg>素材输入</span>
+              <span class="micro-note">支持文本描述 / 文件留档</span>
+            </div>
+
+            <div class="field">
+              <label for="eventText">事件描述 <span>粘贴新闻、群聊记录、内部通报，或直接描述你看到的情况</span></label>
+              <textarea id="eventText" spellcheck="false" placeholder="请描述发生了什么、何时发生、涉及哪些人或组织、目前已确认的影响，以及你最担心的问题。可以先写已知事实，未知信息后续补充。" aria-describedby="eventHelp"></textarea>
+              <small id="eventHelp" class="micro-note">建议包含：事件经过、涉及对象、影响范围、证据来源、已采取措施。无需提供不必要的个人敏感信息。</small>
+              <div class="textarea-foot">
+                <span><b id="charCount">0</b> 字 · 自动保存于本地草稿</span>
+                <button class="text-btn" id="loadDemo">新建空白事件</button>
+              </div>
+            </div>
+
+            <div class="input-split">
+              <div class="file-block">
+                <label class="dropzone" id="dropzone" for="fileInput">
+                  <input type="file" id="fileInput" multiple hidden accept="video/*,image/*,.pdf,.doc,.docx,.txt,.md">
+                  <span class="drop-icon"><svg class="icon"><use href="#i-upload"/></svg></span>
+                  <span><strong>拖入视频或文档</strong><small>MP4 / MOV / PDF / DOCX，单文件 ≤ 200MB</small></span>
+                  <span class="drop-action">浏览文件</span>
+                </label>
+                <div class="file-list" id="fileList"></div>
+              </div>
+
+              <div class="keyword-block">
+                <label for="tagInput">关键词 / 追踪对象</label>
+                <div class="tag-input" id="tagInputWrap">
+                  <input id="tagInput" type="text" placeholder="输入后回车添加" aria-label="添加关键词">
+                </div>
+                <div class="channel-title">监测渠道 <span>可多选</span></div>
+                <div class="channel-list" id="channelList">
+                  <button class="channel active" data-channel="微博" aria-pressed="true">微博</button>
+                  <button class="channel active" data-channel="抖音" aria-pressed="true">抖音</button>
+                  <button class="channel active" data-channel="小红书" aria-pressed="true">小红书</button>
+                  <button class="channel" data-channel="新闻" aria-pressed="false">新闻</button>
+                  <button class="channel" data-channel="知乎" aria-pressed="false">知乎</button>
+                  <button class="channel" data-channel="投诉平台" aria-pressed="false">投诉平台</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="input-actions">
+              <button class="btn btn-primary" id="assessBtn" type="button"><svg class="icon"><use href="#i-chart"/></svg><span>识别并判断等级</span></button>
+              <a class="btn btn-outline" href="#followup"><svg class="icon"><use href="#i-arrow"/></svg><span>继续后续处理</span></a>
+              <span class="scan-note">本地关键词初筛，不上传文本；结果需结合证据人工复核。</span>
+            </div>
+          </div>
+
+          <aside class="scan-panel">
+            <div class="scan-head">
+              <span class="card-label light"><svg class="icon"><use href="#i-radar"/></svg>研判工作区</span>
+              <span class="live-tag">LOCAL</span>
+            </div>
+
+            <div class="radar-wrap">
+              <div class="radar" id="radar">
+                <span class="radar-circle c1"></span><span class="radar-circle c2"></span><span class="radar-circle c3"></span>
+                <span class="radar-cross h"></span><span class="radar-cross v"></span>
+                <span class="radar-sweep"></span>
+                <i class="radar-dot d1"></i><i class="radar-dot d2"></i><i class="radar-dot d3"></i><i class="radar-dot d4"></i><i class="radar-dot d5"></i>
+                <span class="radar-core"><b id="sourceCount">—</b><small>待识别信号</small></span>
+              </div>
+              <div class="scan-stats">
+                <div><span>事件事实</span><strong>待整理</strong></div>
+                <div><span>影响范围</span><strong>待确认</strong></div>
+                <div><span>证据材料</span><strong>待补充</strong></div>
+                <div><span>优先风险</span><strong class="warn">待判断</strong></div>
+              </div>
+            </div>
+
+            <div class="source-list">
+              <div class="source-item">
+                <span class="platform">STEP 01</span>
+                <div><strong>输入事件经过</strong><small>只写你目前掌握的信息</small></div>
+                <span class="sentiment mix">待办</span>
+              </div>
+              <div class="source-item">
+                <span class="platform">STEP 02</span>
+                <div><strong>分开事实与推测</strong><small>列出信息来源和未知项</small></div>
+                <span class="sentiment mix">待办</span>
+              </div>
+              <div class="source-item">
+                <span class="platform">STEP 03</span>
+                <div><strong>确定下一步动作</strong><small>根据风险和时限安排负责人</small></div>
+                <span class="sentiment mix">待办</span>
+              </div>
+            </div>
+
+            <div class="scan-progress">
+              <div class="scan-progress-row"><span id="scanStatus">等待输入事件</span><b id="scanPercent">0%</b></div>
+              <div class="scan-track"><i id="scanBar" style="width:0%"></i></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ANALYSIS -->
+      <section class="section" id="analysis">
+        <div class="section-head">
+          <div class="section-index"><span>02</span><i></i></div>
+          <div class="section-title">
+            <p class="eyebrow">ASSESS &amp; GRADE</p>
+            <h2>先判断它会不会失控，<br class="desktop-break">再决定说什么。</h2>
+            <p>定级用于帮助安排响应资源和优先级。以下结果只在提交事件描述后生成，具体决策仍需人工核实。</p>
+          </div>
+          <div class="section-note"><span>MODULE 02</span>五级危机分级<br>事实 / 情绪 / 监管三维交叉</div>
+        </div>
+
+        <div class="analysis-grid">
+          <div class="card level-card">
+            <div class="card-topline">
+              <span class="card-label"><svg class="icon"><use href="#i-chart"/></svg>五级危机罗盘</span>
+              <span class="micro-note" id="currentLevelNote">等待事件输入</span>
+            </div>
+
+            <div class="level-list" role="list">
+              <div class="level-row" data-level="1" role="listitem" style="--level-color:#7297c9">
+                <span class="level-code">L1</span>
+                <div class="level-copy"><strong>观察级</strong><span>局部负评，事实清晰，无安全或法律风险</span></div>
+                <span class="level-signal">监测</span>
+              </div>
+              <div class="level-row" data-level="2" role="listitem" style="--level-color:#4f9d92">
+                <span class="level-code">L2</span>
+                <div class="level-copy"><strong>关注级</strong><span>跨平台讨论，媒体开始跟进，品牌形象受损</span></div>
+                <span class="level-signal">轻响应</span>
+              </div>
+              <div class="level-row" data-level="3" role="listitem" style="--level-color:#e0a319">
+                <span class="level-code">L3</span>
+                <div class="level-copy"><strong>扩散级</strong><span>登上热搜，KOL 介入，出现线下退单或渠道波动</span></div>
+                <span class="level-signal">4h 定调</span>
+              </div>
+              <div class="level-row" data-level="4" role="listitem" style="--level-color:#e86a33">
+                <span class="level-code">L4</span>
+                <div class="level-copy"><strong>严重级</strong><span>监管介入、人群健康受损、系统性抵制或诉讼</span></div>
+                <span class="level-signal">战情室</span>
+              </div>
+              <div class="level-row" data-level="5" role="listitem" style="--level-color:#d9382e">
+                <span class="level-code">L5</span>
+                <div class="level-copy"><strong>生存级</strong><span>人身安全、系统性造假、资本市场或存续危机</span></div>
+                <span class="level-signal">最高响应</span>
+              </div>
+            </div>
+
+            <div class="level-foot">
+              <svg class="icon"><use href="#i-alert"/></svg>
+              <span id="levelReason">若 24 小时内仍无有效回应，模型预测升级至 <b>L4 的概率为 64%</b>。</span>
+            </div>
+          </div>
+
+          <div class="analysis-side">
+            <div class="card score-card">
+              <div class="card-topline">
+                <span class="card-label"><svg class="icon"><use href="#i-sliders"/></svg>定级证据</span>
+                <span class="micro-note">本地规则估算</span>
+              </div>
+              <div class="dimensions">
+                <div class="dim"><div class="dim-head"><span>传播速度</span><b data-dimension="spread">—</b></div><div class="dim-track"><i data-dimension-bar="spread" style="width:0%"></i></div></div>
+                <div class="dim"><div class="dim-head"><span>权益受损程度</span><b data-dimension="impact">—</b></div><div class="dim-track"><i data-dimension-bar="impact" style="width:0%"></i></div></div>
+                <div class="dim"><div class="dim-head"><span>事实信号强度</span><b data-dimension="evidence">—</b></div><div class="dim-track"><i data-dimension-bar="evidence" style="width:0%"></i></div></div>
+                <div class="dim"><div class="dim-head"><span>监管风险</span><b data-dimension="regulatory">—</b></div><div class="dim-track"><i data-dimension-bar="regulatory" style="width:0%"></i></div></div>
+                <div class="dim"><div class="dim-head"><span>组织脆弱性</span><b data-dimension="organization">—</b></div><div class="dim-track"><i data-dimension-bar="organization" style="width:0%"></i></div></div>
+              </div>
+              <div class="score-callout">
+                <div><span>综合风险</span><strong><span id="overallRiskScore">—</span><span>/100</span></strong></div>
+                <p id="assessmentSummary">填写事件描述后，这里显示综合风险估算及判断依据。</p>
+              </div>
+            </div>
+
+            <div class="forecast-card">
+              <div class="forecast-top"><span>升级预警</span><strong id="forecastLabel">待判断</strong></div>
+              <div class="forecast-scale"><span>L3</span><i></i><span>L4</span><i></i><span>L5</span></div>
+              <p id="forecastText">识别完成后，根据已提及的风险信号提示需要优先核实的事项。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="narratives">
+          <article class="narrative fact">
+            <div class="nar-head"><span>01 / 事实骨架</span><i>WHAT WE KNOW</i></div>
+            <h3>事实与未知项</h3>
+            <p id="factNarrative">完成事件研判后，在此整理已确认事实、信息来源，以及仍需核实的关键问题。</p>
+            <div class="nar-tags"><span>已确认：待输入</span><span>待核实：待输入</span></div>
+          </article>
+          <article class="narrative public">
+            <div class="nar-head"><span>02 / 公众叙事</span><i>WHAT THEY FEEL</i></div>
+            <h3>影响对象与关切</h3>
+            <p id="stakeholderNarrative">记录受影响的人群、组织或业务，以及他们当前最需要解决的问题。</p>
+            <div class="nar-tags"><span>影响范围</span><span>核心诉求</span></div>
+          </article>
+          <article class="narrative strategy">
+            <div class="nar-head"><span>03 / 公关定调</span><i>WHAT WE FIGHT FOR</i></div>
+            <h3>下一步处置重点</h3>
+            <p id="actionNarrative">研判后按紧急程度列出需要确认、保护、沟通或升级处理的事项。</p>
+            <div class="nar-tags"><span>负责人</span><span>时限</span><span>验证方式</span></div>
+          </article>
+        </div>
+
+        <div class="language-strip">
+          <div class="lang-block bad">
+            <span class="lang-label"><svg class="icon"><use href="#i-x"/></svg>不要这样说</span>
+            <p>先核对事实再对外表态<i>·</i>清楚标注未知信息<i>·</i>避免未经证实的定性</p>
+          </div>
+          <div class="lang-block good">
+            <span class="lang-label"><svg class="icon"><use href="#i-check"/></svg>换成这样说</span>
+            <p>说明已确认信息、正在采取的行动、负责人和下一次更新时间。</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- FOLLOW-UP WORKSPACE -->
+      <section class="section" id="followup">
+        <div class="section-head">
+          <div class="section-index"><span>03</span><i></i></div>
+          <div class="section-title">
+            <p class="eyebrow">FOLLOW-UP DESK</p>
+            <h2>继续补充信息，<br class="desktop-break">把判断变成行动。</h2>
+            <p>记录你的追问、最新进展或希望解决的问题。下方预留对话与处置计划区域，便于后续接入 AI 或团队协作。</p>
+          </div>
+          <div class="section-note"><span>WORKSPACE</span>对话记录<br>后续处理</div>
+        </div>
+        <div class="followup-grid">
+          <div class="card followup-chat">
+            <div class="card-topline"><span class="card-label"><svg class="icon"><use href="#i-file"/></svg>事件对话</span><span class="micro-note">本地草稿</span></div>
+            <div class="chat-thread" id="chatThread" aria-live="polite" aria-label="事件对话记录">
+              <div class="chat-empty" id="chatEmpty">还没有对话记录。可以补充新证据、说明影响变化，或询问下一步该怎么做。</div>
+            </div>
+            <label class="field followup-field" for="followupInput"><span>补充情况 / 追问</span><textarea id="followupInput" placeholder="输入补充信息或问题；Ctrl+Enter 提交"></textarea></label>
+            <div class="followup-actions"><span class="micro-note">内容保存在当前浏览器，不会发送到服务器。</span><button class="btn btn-primary" id="addFollowup" type="button"><svg class="icon"><use href="#i-arrow"/></svg><span>添加到记录</span></button></div>
+          </div>
+          <div class="card followup-plan">
+            <div class="card-topline"><span class="card-label"><svg class="icon"><use href="#i-check"/></svg>后续处理</span><span class="micro-note" id="planStatus">等待研判</span></div>
+            <p class="plan-intro" id="planIntro">完成事件描述并点击“识别并判断等级”后，这里会给出通用的首轮处理清单。</p>
+            <ol class="action-list" id="actionList">
+              <li><span>01</span><div><b>核对事实</b><small>确认时间、地点、涉及对象及信息来源。</small></div></li>
+              <li><span>02</span><div><b>评估影响</b><small>确认是否存在人身安全、财产或业务连续性风险。</small></div></li>
+              <li><span>03</span><div><b>安排负责人</b><small>为每项行动指定责任人、完成时限和复核方式。</small></div></li>
+            </ol>
+            <label class="field followup-field" for="handlingNotes"><span>处置记录 / 负责人 / 截止时间</span><textarea id="handlingNotes" placeholder="记录已采取的措施、负责人、截止时间和完成状态……"></textarea></label>
+            <div class="followup-actions"><span class="micro-note">处置清单为工作提示，按实际情况调整。</span><button class="btn btn-outline" id="saveHandling" type="button"><svg class="icon"><use href="#i-check"/></svg><span>保存记录</span></button></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STRATEGY -->
+      <section class="section" id="strategy">
+        <div class="section-head">
+          <div class="section-index"><span>03</span><i></i></div>
+          <div class="section-title">
+            <p class="eyebrow">STRATEGY LAB</p>
+            <h2>不要选一个「正确」的动作，<br class="desktop-break">选一组彼此不打架的动作。</h2>
+            <p>结合事件等级、事实边界和受影响对象，整理可执行动作、负责人、时限与复核方式。</p>
+          </div>
+          <div class="section-note"><span>MODULE 04</span>行动清单<br>负责人 / 时限 / 复核</div>
+        </div>
+
+        <div class="strategy-empty card">
+          <div class="card-label"><svg class="icon"><use href="#i-check"/></svg>策略与执行计划</div>
+          <p>完成研判后，在此确定响应目标、优先动作、沟通对象、责任人和完成时限。建议先处理安全与持续损害，再核实事实并安排沟通。</p>
+          <a class="btn btn-outline" href="#followup">前往后续处理工作区<svg class="icon"><use href="#i-arrow"/></svg></a>
+        </div>
+
+        <div class="strategy-toolbar">
+          <div class="selection-summary">
+            <span class="selection-dot"></span>
+            <span>已选择 <b id="selectedCount">3</b> 项策略</span>
+            <span class="toolbar-divider"></span>
+            <span class="conflict-mini" id="conflictMini"><svg class="icon"><use href="#i-check"/></svg>逻辑一致</span>
+          </div>
+          <div class="toolbar-actions">
+            <button class="text-btn" id="restoreRecommended">恢复推荐组合</button>
+            <button class="btn btn-primary btn-sm" id="runSim"><svg class="icon"><use href="#i-spark"/></svg><span>运行组合推演</span></button>
+          </div>
+        </div>
+
+        <div class="strategy-layout">
+          <div class="strategy-grid" id="strategyGrid">
+            <article class="strategy-card selected" data-id="a" data-prob="74">
+              <div class="strategy-top">
+                <div class="strategy-id"><span>01</span><i>SPEED</i></div>
+                <div class="strategy-badges"><span class="badge rec">建议</span><label class="check-wrap"><input type="checkbox" data-strategy="a" checked aria-label="选择策略：4 小时内承认事实边界"><span class="fake-check"><svg class="icon"><use href="#i-check"/></svg></span></label></div>
+              </div>
+              <h3>4 小时内，承认「事实边界」</h3>
+              <p class="strategy-desc">先于谣言定义问题：承认已确认的画面与影响，明确尚不能确认的部分，给出下一次信息更新时间。</p>
+              <div class="prob-row"><span>单点成功率</span><strong>74<span>%</span></strong></div>
+              <div class="prob-track"><i style="width:74%"></i></div>
+              <div class="strategy-tags"><span>低成本</span><span>4 小时</span><span>CEO + 法务</span></div>
+              <button class="resource-toggle" aria-expanded="false"><span><svg class="icon"><use href="#i-phone"/></svg>执行资源与联络</span><svg class="icon chev"><use href="#i-chev"/></svg></button>
+              <div class="resource-drawer">
+                <div class="resource-grid">
+                  <div><span>发布通道</span><b>官微 · 官网新闻室 · 媒体邮件</b><small>需企业认证、CEO 署名、法务会签</small></div>
+                  <div><span>公开入口</span><b>微博企业服务中心</b><small>企业认证与舆情申诉绿色通道</small></div>
+                  <div><span>内部角色</span><b>CEO / 法务 / 供应链负责人</b><small>演示占位，接入通讯录后显示真实联系人</small></div>
+                  <div><span>前置条件</span><b>事实核验 ≥ 80%</b><small>避免在批次范围未明时作出绝对承诺</small></div>
+                </div>
+              </div>
+            </article>
+
+            <article class="strategy-card selected" data-id="b" data-prob="69">
+              <div class="strategy-top">
+                <div class="strategy-id"><span>02</span><i>PROOF</i></div>
+                <div class="strategy-badges"><span class="badge rec">建议</span><label class="check-wrap"><input type="checkbox" data-strategy="b" checked aria-label="选择策略：第三方检测与工厂直播"><span class="fake-check"><svg class="icon"><use href="#i-check"/></svg></span></label></div>
+              </div>
+              <h3>把「自证」变成「可验证」</h3>
+              <p class="strategy-desc">邀请 CMA/CNAS 实验室抽检，开放工厂直播与批次追溯页。让第三方和公众成为证据的一部分。</p>
+              <div class="prob-row"><span>单点成功率</span><strong>69<span>%</span></strong></div>
+              <div class="prob-track"><i style="width:69%"></i></div>
+              <div class="strategy-tags"><span>中成本</span><span>24–48 小时</span><span>第三方机构</span></div>
+              <button class="resource-toggle" aria-expanded="false"><span><svg class="icon"><use href="#i-phone"/></svg>执行资源与联络</span><svg class="icon chev"><use href="#i-chev"/></svg></button>
+              <div class="resource-drawer">
+                <div class="resource-grid">
+                  <div><span>检测资源</span><b>SGS 中国 / 华测检测 CTI</b><small>官网商务入口，需确认资质、排期与抽样规范</small></div>
+                  <div><span>直播通道</span><b>抖音企业号 · 视频号</b><small>提前报备直播计划，准备媒体问答</small></div>
+                  <div><span>公开入口</span><b>全国认证认可信息公共服务平台</b><small>核验 CMA / CNAS 资质与报告编号</small></div>
+                  <div><span>内部角色</span><b>供应链 / 品控 / 工厂负责人</b><small>演示占位，需工厂授权与拍摄许可</small></div>
+                </div>
+              </div>
+            </article>
+
+            <article class="strategy-card selected" data-id="c" data-prob="86">
+              <div class="strategy-top">
+                <div class="strategy-id"><span>03</span><i>REPAIR</i></div>
+                <div class="strategy-badges"><span class="badge rec">建议</span><label class="check-wrap"><input type="checkbox" data-strategy="c" checked aria-label="选择策略：批次召回与用户补偿"><span class="fake-check"><svg class="icon"><use href="#i-check"/></svg></span></label></div>
+              </div>
+              <h3>先赔、先退、先封存</h3>
+              <p class="strategy-desc">不等责任完全厘清，先对受影响用户做无条件退款/补偿，封存争议批次。实质修复比态度表达更能止损。</p>
+              <div class="prob-row"><span>单点成功率</span><strong>86<span>%</span></strong></div>
+              <div class="prob-track"><i style="width:86%"></i></div>
+              <div class="strategy-tags"><span>高预算</span><span>12 小时</span><span>客服 + 财务</span></div>
+              <button class="resource-toggle" aria-expanded="false"><span><svg class="icon"><use href="#i-phone"/></svg>执行资源与联络</span><svg class="icon chev"><use href="#i-chev"/></svg></button>
+              <div class="resource-drawer">
+                <div class="resource-grid">
+                  <div><span>执行系统</span><b>客服工单 · 小程序订单 · 支付渠道</b><small>按批次/渠道圈定人群，避免遗漏线下门店</small></div>
+                  <div><span>公开入口</span><b>全国 12315 平台</b><small>12315 热线 / www.12315.cn，主动报备处理方案</small></div>
+                  <div><span>合规角色</span><b>法务 / 财务 / 客服负责人</b><small>补偿规则需避免歧视性与二次争议</small></div>
+                  <div><span>关键指标</span><b>退款达成率 · 二次投诉率</b><small>建议每 6 小时向战情室回报</small></div>
+                </div>
+              </div>
+            </article>
+
+            <article class="strategy-card" data-id="d" data-prob="57">
+              <div class="strategy-top">
+                <div class="strategy-id"><span>04</span><i>FACE</i></div>
+                <div class="strategy-badges"><span class="badge cond">条件性</span><label class="check-wrap"><input type="checkbox" data-strategy="d" aria-label="选择策略：创始人直播问答"><span class="fake-check"><svg class="icon"><use href="#i-check"/></svg></span></label></div>
+              </div>
+              <h3>创始人出面，但不背稿</h3>
+              <p class="strategy-desc">用真实的人承担不确定：直播回应、接受追问、承诺下一次更新。前提是创始人具备现场能力且事实已基本清楚。</p>
+              <div class="prob-row"><span>单点成功率</span><strong>57<span>%</span></strong></div>
+              <div class="prob-track"><i style="width:57%"></i></div>
+              <div class="strategy-tags"><span>中成本</span><span>24 小时</span><span>高波动</span></div>
+              <button class="resource-toggle" aria-expanded="false"><span><svg class="icon"><use href="#i-phone"/></svg>执行资源与联络</span><svg class="icon chev"><use href="#i-chev"/></svg></button>
+              <div class="resource-drawer">
+                <div class="resource-grid">
+                  <div><span>直播通道</span><b>抖音 / 视频号 / 微博直播</b><small>需提前准备高频质疑清单与事实卡片</small></div>
+                  <div><span>支持团队</span><b>创始人 / 公关 / 法务 / 客服</b><small>设置实时辟谣与情绪降温小组</small></div>
+                  <div><span>风险点</span><b>历史言论被翻出</b><small>建议提前做创始人数字足迹审计</small></div>
+                  <div><span>不适合</span><b>事实链未明 / 存在健康损害</b><small>此时直播容易变成二次事故现场</small></div>
+                </div>
+              </div>
+            </article>
+
+            <article class="strategy-card caution" data-id="e" data-prob="34">
+              <div class="strategy-top">
+                <div class="strategy-id"><span>05</span><i>WAIT</i></div>
+                <div class="strategy-badges"><span class="badge caution">谨慎</span><label class="check-wrap"><input type="checkbox" data-strategy="e" aria-label="选择策略：冷处理等待热度下降"><span class="fake-check"><svg class="icon"><use href="#i-check"/></svg></span></label></div>
+              </div>
+              <h3>冷处理，让热度自然下降</h3>
+              <p class="strategy-desc">仅在事件无新增事实、无健康风险、讨论已见顶时考虑。当前事件仍在扩散期，单独使用可能被解读为默认。</p>
+              <div class="prob-row"><span>单点成功率</span><strong>34<span>%</span></strong></div>
+              <div class="prob-track"><i style="width:34%"></i></div>
+              <div class="strategy-tags"><span>极低成本</span><span>3–7 天</span><span>高反噬</span></div>
+              <button class="resource-toggle" aria-expanded="false"><span><svg class="icon"><use href="#i-phone"/></svg>执行资源与联络</span><svg class="icon chev"><use href="#i-chev"/></svg></button>
+              <div class="resource-drawer">
+                <div class="resource-grid">
+                  <div><span>监测配置</span><b>品牌词 · 竞品词 · 监管词</b><small>设置升温阈值与自动告警</small></div>
+                  <div><span>内部角色</span><b>公关负责人 / 数据监测</b><small>每日两次向管理层简报</small></div>
+                  <div><span>停止条件</span><b>热搜回升 / 监管发声 / 就医案例</b><small>触发后立即切换到主动回应</small></div>
+                  <div><span>不建议</span><b>存在食品安全或人身风险</b><small>沉默会被视为系统性隐瞒</small></div>
+                </div>
+              </div>
+            </article>
+
+            <article class="strategy-card caution" data-id="f" data-prob="28">
+              <div class="strategy-top">
+                <div class="strategy-id"><span>06</span><i>LAW</i></div>
+                <div class="strategy-badges"><span class="badge caution">谨慎</span><label class="check-wrap"><input type="checkbox" data-strategy="f" aria-label="选择策略：法律维权与报警"><span class="fake-check"><svg class="icon"><use href="#i-check"/></svg></span></label></div>
+              </div>
+              <h3>法律反制，但不拿它当第一反应</h3>
+              <p class="strategy-desc">只适用于证据完整、存在组织化造谣或敲诈的情形。把法律动作前置，容易把「维权」叙事变成「以大欺小」。</p>
+              <div class="prob-row"><span>单点成功率</span><strong>28<span>%</span></strong></div>
+              <div class="prob-track"><i style="width:28%"></i></div>
+              <div class="strategy-tags"><span>中成本</span><span>1–3 个月</span><span>高对抗</span></div>
+              <button class="resource-toggle" aria-expanded="false"><span><svg class="icon"><use href="#i-phone"/></svg>执行资源与联络</span><svg class="icon chev"><use href="#i-chev"/></svg></button>
+              <div class="resource-drawer">
+                <div class="resource-grid">
+                  <div><span>法律资源</span><b>外部律所 · 公证处 · 电子取证</b><small>先完成证据保全，再评估是否公开动作</small></div>
+                  <div><span>平台入口</span><b>各平台侵权投诉通道</b><small>优先下架不实内容，避免公开对线</small></div>
+                  <div><span>内部角色</span><b>法务 / CEO / 公关</b><small>法律动作与传播口径必须同步</small></div>
+                  <div><span>反噬提示</span><b>可能延长话题生命周期</b><small>每增加一次法律动作，需评估一次舆情成本</small></div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <aside class="sim-panel">
+            <div class="sim-head"><span>组合推演</span><span class="mono">SIM / 01</span></div>
+            <div class="sim-score-wrap">
+              <div class="sim-ring">
+                <svg viewBox="0 0 140 140" aria-hidden="true">
+                  <circle cx="70" cy="70" r="58" class="sim-ring-track"/>
+                  <circle cx="70" cy="70" r="58" class="sim-ring-value" id="simRing"/>
+                </svg>
+                <div class="sim-ring-label"><strong id="simScore">82</strong><span>%</span></div>
+              </div>
+              <div class="sim-score-copy"><span>组合达成目标概率</span><small id="simDelta">较单点回应 +19pp</small></div>
+            </div>
+
+            <div class="sim-metrics">
+              <div><span>7 日热度</span><strong id="heatDrop">−46%</strong></div>
+              <div><span>信任修复</span><strong id="trustLift">+19</strong></div>
+              <div><span>预计预算</span><strong id="budget">28–45<small>万</small></strong></div>
+              <div><span>执行风险</span><strong id="riskLabel">中低</strong></div>
+            </div>
+
+            <div class="sim-sequence">
+              <span>建议执行顺序</span>
+              <div id="sequenceList">
+                <b>A</b><i>→</i><b>B</b><i>→</i><b>C</b>
+              </div>
+            </div>
+
+            <p class="sim-narrative" id="simNarrative">先用 4 小时声明界定事实，再用第三方检测与工厂直播补足证据，最后用批次补偿完成实质修复。三条线互相支撑，避免「只道歉不行动」。</p>
+
+            <div class="sim-conflict" id="conflictBox">
+              <svg class="icon"><use href="#i-check"/></svg>
+              <span id="conflictText">未发现策略冲突。声明、举证、补偿形成闭环。</span>
+            </div>
+
+            <button class="btn btn-lime sim-run" id="runSimSide"><svg class="icon"><use href="#i-spark"/></svg><span>运行组合推演</span></button>
+            <div class="sim-foot" id="simStatus">基于 3 项策略 · 上次推演 22:16</div>
+            <div class="sim-disclaimer">概率为策略有效性估算，不是结果承诺。</div>
+          </aside>
+        </div>
+
+        <div class="contact-policy">
+          <span class="contact-policy-label"><svg class="icon"><use href="#i-shield"/></svg>联络信息策略</span>
+          <p><b>公开入口</b>（官网 / 官方热线）可直接使用；<b>机构联系人、办公地址与企业人脉</b>默认脱敏，接入 CRM 与企业通讯录并通过权限审批后展示。演示页不编造任何私人联系方式。</p>
+        </div>
+
+        <div class="sim-results">
+          <div class="card chart-card">
+            <div class="card-topline">
+              <span class="card-label"><svg class="icon"><use href="#i-chart"/></svg>执行后 7 天 · 舆情热度</span>
+              <div class="chart-legend"><span><i class="legend-red"></i>不回应</span><span><i class="legend-amber"></i>仅声明</span><span><i class="legend-green"></i>当前组合</span></div>
+            </div>
+            <svg class="line-chart" id="forecastChart" viewBox="0 0 760 280" role="img" aria-label="执行后七天舆情热度预测曲线">
+              <defs>
+                <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#4c8b72"/>
+                  <stop offset="100%" stop-color="#4c8b72" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <g class="chart-grid">
+                <line x1="52" y1="32" x2="740" y2="32"/><line x1="52" y1="88" x2="740" y2="88"/><line x1="52" y1="144" x2="740" y2="144"/><line x1="52" y1="200" x2="740" y2="200"/><line x1="52" y1="246" x2="740" y2="246"/>
+              </g>
+              <g class="chart-labels">
+                <text x="14" y="36">100</text><text x="21" y="92">75</text><text x="21" y="148">50</text><text x="21" y="204">25</text><text x="30" y="250">0</text>
+                <text x="52" y="270">D0</text><text x="166" y="270">D1</text><text x="280" y="270">D2</text><text x="394" y="270">D3</text><text x="508" y="270">D4</text><text x="622" y="270">D5</text><text x="736" y="270">D6</text>
+              </g>
+              <path id="areaCurrent" class="chart-area" d=""/>
+              <path id="lineBaseline" class="chart-line baseline" d=""/>
+              <path id="lineStatement" class="chart-line statement" d=""/>
+              <path id="lineCurrent" class="chart-line current" d=""/>
+              <g id="chartDots"></g>
+              <line x1="52" y1="32" x2="52" y2="246" class="chart-today"/>
+              <text x="58" y="46" class="chart-today-label">NOW</text>
+            </svg>
+            <div class="chart-callout" id="chartCallout"><b>峰值出现在 48 小时内</b>，随后快速回落。真正决定长期损失的，是「代工」是否会成为品牌长期联想词。</div>
+          </div>
+
+          <div class="card timeline-card">
+            <div class="card-topline">
+              <span class="card-label"><svg class="icon"><use href="#i-clock"/></svg>执行剧本</span>
+              <span class="micro-note">Next 7 days</span>
+            </div>
+            <div class="timeline" id="timelineList">
+              <div class="timeline-item"><span class="tl-time">T+0–4h</span><div><b>定调</b><p>发布事实边界声明，开通批次查询与退款入口。</p></div></div>
+              <div class="timeline-item"><span class="tl-time">T+12h</span><div><b>举证</b><p>第三方送检，预告工厂直播；公布抽样与封存信息。</p></div></div>
+              <div class="timeline-item"><span class="tl-time">T+24h</span><div><b>修复</b><p>公布初检结果与补偿规则，覆盖线上与线下渠道。</p></div></div>
+              <div class="timeline-item"><span class="tl-time">T+72h</span><div><b>复核</b><p>发布整改清单与第三方复核报告，回应新增质疑。</p></div></div>
+              <div class="timeline-item"><span class="tl-time">T+7d</span><div><b>复盘</b><p>公开整改进度，启动长期供应链透明化项目。</p></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CASES -->
+      <section class="section" id="cases">
+        <div class="section-head">
+          <div class="section-index"><span>04</span><i></i></div>
+          <div class="section-title">
+            <p class="eyebrow">CASE INTELLIGENCE</p>
+            <h2>案例参考与对照。</h2>
+            <p>先完成事件研判，再上传案例数据；从你提供的资料中选择相似案例进行比较。</p>
+          </div>
+          <div class="section-note"><span>MODULE 05</span>用户数据<br>筛选 / 比较</div>
+        </div>
+
+        <div class="dataset-workspace" id="caseWorkspace">
+          <div class="dataset-gate" id="caseGate"><span class="dataset-step">01</span><div><b>先完成上方事件判断</b><small>判断完成后，上传你的案例资料；再从上传内容中选择条目进行比较。</small></div></div>
+          <div class="dataset-toolbar"><label class="dataset-upload"><input type="file" id="caseDataInput" accept=".json,.csv,.txt,application/json,text/csv,text/plain" multiple disabled><span>上传案例数据</span></label><input class="dataset-filter" id="caseFilter" type="search" placeholder="筛选已上传案例" disabled><span id="caseDataStatus">完成事件判断后开放上传 · JSON / CSV / TXT</span></div>
+          <div class="dataset-items" id="caseDataItems"><p class="dataset-empty">尚未上传案例数据</p></div>
+          <div class="dataset-compare" id="caseCompare"><b>案例比较区</b><p>上传数据后，勾选最多 3 个案例，即可在此对照共有字段。</p></div>
+        </div>
+      </section>
+
+      <!-- SUMMARY -->
+      <section class="section" id="summary">
+        <div class="summary-card">
+          <div class="summary-left">
+            <p class="eyebrow light">EXECUTIVE BRIEF / 05</p>
+            <h2>如果只记住<br><em>五件事。</em></h2>
+            <p>记录当前事件的初步判断和后续动作。先关注人员安全与持续影响，再核实事实、明确负责人并按时复核。</p>
+            <button class="btn btn-lime export-trigger"><svg class="icon"><use href="#i-download"/></svg>导出一页简报 .md</button>
+          </div>
+          <div class="summary-right">
+            <ol class="summary-list">
+              <li><span>01</span><div><b>事件等级：等待输入后判断。</b><p>使用事件描述区录入情况，结果只作为初筛参考。</p></div></li>
+              <li><span>02</span><div><b>事实边界：区分确认内容与未知项。</b><p>为关键信息标注来源，避免把传闻或推测写成事实。</p></div></li>
+              <li><span>03</span><div><b>优先级：先处理安全与持续损害。</b><p>确认受影响对象、当前风险和需要立即采取的保护措施。</p></div></li>
+              <li><span>04</span><div><b>执行计划：明确负责人和时限。</b><p>记录行动、责任人、完成时间和复核方式。</p></div></li>
+              <li><span>05</span><div><b>沟通原则：准确、克制、持续更新。</b><p>说明已知、未知、正在做什么以及下一次更新时间。</p></div></li>
+            </ol>
+            <div class="summary-foot"><span>请按事件类型指定适当的决策人和执行负责人</span><span class="mono">PRISM · WORKSPACE</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROMPT -->
+      <section class="section" id="prompt">
+        <div class="section-head">
+          <div class="section-index"><span>06</span><i></i></div>
+          <div class="section-title">
+            <p class="eyebrow">PROMPT TOOLKIT</p>
+            <h2>把方法，变成可以<br class="desktop-break">复用的提示词。</h2>
+            <p>不是让 AI「写一篇公关稿」，而是让它按事实、分级、策略、概率、资源、反噬的结构工作。复制即用。</p>
+          </div>
+          <div class="section-note"><span>MODULE 06</span>结构化提示词<br>可接入任意大模型</div>
+        </div>
+
+        <div class="prompt-layout">
+          <div class="prompt-intro">
+            <span class="prompt-badge"><svg class="icon"><use href="#i-spark"/></svg>AI WORKFLOW</span>
+            <h3>好提示词，<br>是把顾问的<br>思考顺序写下来。</h3>
+            <ul>
+              <li><span>01</span>先限定证据，不允许编造</li>
+              <li><span>02</span>先分级，再给策略</li>
+              <li><span>03</span>每个策略必须给成功率与反噬</li>
+              <li><span>04</span>联系人只给公开入口，不虚构人脉</li>
+            </ul>
+            <p class="prompt-tip">提示：把 <code>{{事件材料}}</code> 替换成你的新闻链接、视频转写或内部通报。</p>
+          </div>
+
+          <div class="prompt-terminal">
+            <div class="terminal-top">
+              <div class="terminal-dots"><i></i><i></i><i></i></div>
+              <div class="prompt-tabs" role="tablist">
+                <button class="prompt-tab active" data-prompt="grade" role="tab" aria-selected="true">01 危机定级</button>
+                <button class="prompt-tab" data-prompt="strategy" role="tab" aria-selected="false">02 策略推演</button>
+                <button class="prompt-tab" data-prompt="statement" role="tab" aria-selected="false">03 声明起草</button>
+              </div>
+            </div>
+            <pre class="prompt-code" id="promptText"></pre>
+            <div class="terminal-foot">
+              <span>可直接粘贴至 DeepSeek / GPT / Claude</span>
+              <button class="copy-btn" id="copyPrompt"><svg class="icon"><use href="#i-copy"/></svg><span>复制提示词</span></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PARTNERS -->
+      <section class="section" id="partners">
+        <div class="section-head">
+          <div class="section-index"><span>07</span><i></i></div>
+          <div class="section-title">
+            <p class="eyebrow">EXTERNAL BRAIN</p>
+            <h2>公关资源筛选与比较。</h2>
+            <p>研判完成后，上传你掌握的机构或服务资料；这里只呈现并比较你提供的数据。</p>
+          </div>
+          <div class="section-note"><span>MODULE 08</span>用户数据<br>筛选 / 比较</div>
+        </div>
+
+        <div class="dataset-workspace" id="prWorkspace">
+          <div class="dataset-gate" id="prGate"><span class="dataset-step">02</span><div><b>研判完成后再比较公关资源</b><small>上传你自己的公关机构或服务方案资料，按事件需求筛选并横向比较。</small></div></div>
+          <div class="dataset-toolbar"><label class="dataset-upload"><input type="file" id="prDataInput" accept=".json,.csv,.txt,application/json,text/csv,text/plain" multiple disabled><span>上传公关数据</span></label><input class="dataset-filter" id="prFilter" type="search" placeholder="筛选已上传公关数据" disabled><span id="prDataStatus">完成事件判断后开放上传 · JSON / CSV / TXT</span></div>
+          <div class="dataset-items" id="prDataItems"><p class="dataset-empty">尚未上传公关机构或服务方案数据</p></div>
+          <div class="dataset-compare" id="prCompare"><b>公关资源比较区</b><p>上传数据后，勾选最多 3 项，即可比较服务范围、经验、报价或其他资料字段。</p></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-brand"><span class="brand-mark small"><i></i><i></i><i></i></span><b>PRISM</b><span>危机公关处理器</span></div>
+      <p>PRISM 本地研判工作台 · 当前事件与处置记录保存在此浏览器；初步判断需人工复核。</p>
+      <div class="footer-links">
+        <a href="https://www.12315.cn" target="_blank" rel="noopener noreferrer">12315</a>
+        <a href="https://www.12377.cn" target="_blank" rel="noopener noreferrer">12377</a>
+        <a href="https://www.sgs.com.cn" target="_blank" rel="noopener noreferrer">SGS</a>
+        <a href="https://www.cti-cert.com" target="_blank" rel="noopener noreferrer">CTI</a>
+      </div>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"><svg class="icon"><use href="#i-check"/></svg><span id="toastText">已完成</span></div>
+  <script>
+/* =========================================================
+   PRISM — Crisis PR Processor
+   Demo interactions. All case data is fictional unless noted.
+   ========================================================= */
+
+(function () {
+  "use strict";
+
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+
+  const STRATEGIES = {
+    a: { name: "4 小时事实边界声明", short: "事实声明", prob: 74, cost: 6, rank: 1 },
+    b: { name: "第三方检测与工厂直播", short: "第三方举证", prob: 69, cost: 14, rank: 2 },
+    c: { name: "批次召回与用户补偿", short: "批次补偿", prob: 86, cost: 19, rank: 3 },
+    d: { name: "创始人直播问答", short: "创始人对话", prob: 57, cost: 8, rank: 4 },
+    e: { name: "冷处理等待热度下降", short: "冷处理", prob: 34, cost: 1, rank: 6 },
+    f: { name: "法律维权与报警", short: "法律反制", prob: 28, cost: 6, rank: 5 }
+  };
+
+  const RECOMMENDED = ["a", "b", "c"];
+  const PROMPTS = {
+    grade: `你是一名同时具备危机公关、传播学、法律合规与企业经营经验的高级策略顾问。
+
+任务：基于我提供的材料，对危机事件做一次可执行的初步研判。只使用材料中可核验的信息；无法确认的内容必须明确标为「未知」，不得补全，也不得编造信源。
+
+【事件材料】
+{{事件材料}}
+
+【输出结构】
+1. 事实骨架
+   - 已确认事实（括号注明证据类型：视频 / 截图 / 媒体报道 / 官方通报 / 当事人陈述）
+   - 关键未知（按对决策的重要性排序）
+   - 事件时间线（材料不足则说明）
+
+2. 五级定级
+   - 等级：L1 观察 / L2 关注 / L3 扩散 / L4 严重 / L5 生存
+   - 风险分：0-100
+   - 五个维度：传播速度、权益受损、事实确定性、监管风险、组织脆弱性
+   - 定级理由（不超过 150 字）
+   - 24 小时升级概率 + 触发条件
+
+3. 三种叙事
+   - 事实版：公众目前能确认什么
+   - 公众版：公众真正在愤怒或恐惧什么
+   - 策略版：品牌应该争夺的叙事
+
+4. 利益相关方
+   - 用户 / 员工 / 渠道 / 监管 / 媒体 / 投资人，各自最关心什么
+
+5. 语言红线
+   - 不能说的话，以及可替代说法
+
+6. 立即确认的三个问题
+   - 每个问题标明：找谁确认、需要什么证据、最晚何时确认
+
+要求：不要写公关稿，不要给空泛建议，不要编造联系人。所有概率必须说明估算依据。`,
+    strategy: `你是危机公关战情室的策略负责人。请基于下列材料与定级结果，设计一组「彼此不打架」的行动组合。
+
+【事件材料】
+{{事件材料}}
+
+【当前定级】
+{{定级结果}}
+
+【任务】
+给出 6-8 种应对手段，并按「建议 / 条件性 / 谨慎」分类。每种手段必须包含：
+- 名称与一句话目标
+- 3 个关键动作
+- 前置条件
+- 单点成功率（0-100）及估算依据
+- 预算量级
+- 最佳时间窗口
+- 最大反噬风险
+- 所需资源：公开机构入口 / 内部角色 / 外部专业机构
+
+然后给出：
+1. 推荐组合（不超过 3 项）及组合成功率
+2. 协同点与冲突点
+3. 建议执行顺序
+4. 执行后 7 天剧本（按 T+0、T+4h、T+12h、T+24h、T+72h、T+7d）
+5. 早期预警指标
+6. 停止条件：出现什么信号时必须换策略
+
+约束：
+- 不得虚构联系人、电话、地址或私人关系。
+- 只给公开机构入口、公开热线或岗位角色。
+- 明确区分「事实」与「判断」。
+- 若信息不足，先列出需要补充的证据，再给条件性建议。`,
+    statement: `你是企业危机沟通负责人。请基于已核实事实，为 CEO 起草第一次公开回应。
+
+【事件材料】
+{{事件材料}}
+
+【已核实事实】
+{{已核实事实}}
+
+【尚未确认】
+{{未知信息}}
+
+【必须包含】
+1. 对谁说了什么：先对受影响用户，再对公众
+2. 我们已确认什么、尚未确认什么
+3. 已经采取的立即行动（封存 / 送检 / 退款 / 停业 / 召回）
+4. 对受影响用户的补偿或召回安排
+5. 如何验证整改：第三方机构、批次查询、公开时间表
+6. 下一次信息更新时间
+7. 接受监督的具体方式
+
+【禁止】
+- 不甩锅给「个别门店」「临时工」「行业惯例」
+- 不用「符合国家标准」替代对消费者不安的回应
+- 不在事实未明时作出绝对承诺
+- 不使用「恶意抹黑」「已报警」作为第一反应
+
+【输出】
+A. 120-180 字短版（用于首条微博）
+B. 400-600 字完整版（用于官网 / 公众号）
+C. 3 条媒体可能追问 + 建议回答
+D. 本次回应的禁用词清单`
+  };
+
+  const state = {
+    selected: new Set(RECOMMENDED),
+    prompt: "grade",
+    scanning: false,
+    toastTimer: null
+  };
+
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+  const fmtNumber = (value) => new Intl.NumberFormat("zh-CN").format(value);
+
+  function showToast(message) {
+    const toast = $("#toast");
+    const text = $("#toastText");
+    if (!toast || !text) return;
+    text.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(state.toastTimer);
+    state.toastTimer = setTimeout(() => toast.classList.remove("show"), 2800);
+  }
+
+  function setButtonBusy(button, busy, label) {
+    if (!button) return;
+    const textNode = $("span", button);
+    if (busy) {
+      button.disabled = true;
+      if (textNode) textNode.textContent = label || "推演中…";
+    } else {
+      button.disabled = false;
+      if (textNode) textNode.textContent = label || "运行组合推演";
+    }
+  }
+
+  /* ---------------------------------------------------------
+     INPUT / TEXT
+     --------------------------------------------------------- */
+  const eventText = $("#eventText");
+  const charCount = $("#charCount");
+
+  function updateCharCount() {
+    if (!eventText || !charCount) return;
+    charCount.textContent = fmtNumber(eventText.value.length);
+  }
+
+  function saveDraft() {
+    if (!eventText) return;
+    try {
+      localStorage.setItem("prism-event-draft-v2", eventText.value);
+    } catch (error) {
+      /* file:// 或隐私模式下 localStorage 可能不可用，忽略即可 */
+    }
+  }
+
+  if (eventText) {
+    try {
+      const savedDraft = localStorage.getItem("prism-event-draft-v2");
+      if (savedDraft) eventText.value = savedDraft;
+    } catch (error) {
+      /* 使用 HTML 中的示例文本 */
+    }
+    eventText.addEventListener("input", () => {
+      updateCharCount();
+      saveDraft();
+      renderPrompt(state.prompt);
+    });
+  }
+
+  /* Local heuristic assessment: signal matching only, not AI or web monitoring. */
+  const ASSESSMENT_LEVELS = [
+    { name: "观察级", action: "持续记录信息，核实事实后再更新判断。", response: "常规监测", color: "#7297c9" },
+    { name: "关注级", action: "指定负责人跟进，并准备简短事实说明。", response: "轻量响应", color: "#4f9d92" },
+    { name: "扩散级", action: "尽快核实关键事实，统一对外口径。", response: "加速响应", color: "#e0a319" },
+    { name: "严重级", action: "立即升级管理层，启动跨部门处置。", response: "启动战情室", color: "#e86a33" },
+    { name: "生存级", action: "优先保护人员安全并启动最高级别应急机制。", response: "最高响应", color: "#d9382e" }
+  ];
+  const SIGNALS = {
+    spread: [
+      { words: ["热搜", "刷屏", "全网", "爆发", "疯传", "直播曝光"], points: 20 },
+      { words: ["跨平台", "多平台", "微博", "抖音", "小红书", "媒体跟进", "新闻报道", "kol", "网红"], points: 12 },
+      { words: ["转发", "传播", "舆情", "讨论", "投诉"], points: 6 }
+    ],
+    impact: [
+      { words: ["死亡", "重伤", "住院", "就医", "中毒", "受伤", "人身安全"], points: 28 },
+      { words: ["退单", "退款", "召回", "停业", "损失", "消费者", "员工受伤"], points: 14 },
+      { words: ["不满", "差评", "投诉", "抵制", "退货"], points: 8 }
+    ],
+    evidence: [
+      { words: ["官方通报", "监管通报", "检测报告", "法院判决", "已确认", "已证实", "承认"], points: 24 },
+      { words: ["视频", "截图", "录音", "文件", "票据", "现场"], points: 12 },
+      { words: ["疑似", "网传", "据称", "可能", "尚未确认", "未经证实"], points: 4 }
+    ],
+    regulatory: [
+      { words: ["立案", "监管介入", "行政处罚", "调查组", "停产", "召回", "诉讼", "违法"], points: 24 },
+      { words: ["食品安全", "药品", "隐私泄露", "数据泄露", "劳动监察", "环保", "未成年人"], points: 14 },
+      { words: ["监管", "投诉平台", "举报", "合规"], points: 7 }
+    ],
+    organization: [
+      { words: ["高管辞职", "创始人", "系统性造假", "财务造假", "停摆", "破产", "裁员", "资金链"], points: 20 },
+      { words: ["没有回应", "未回应", "沉默", "道歉", "内部通报", "代工厂", "供应链"], points: 10 }
+    ]
+  };
+
+  let assessmentComplete = false;
+  const uploadedComparisonData = { cases: [], pr: [] };
+
+  function signalScore(text, groups) {
+    return clamp(groups.reduce((total, group) => {
+      return total + (group.words.some((word) => text.includes(word)) ? group.points : 0);
+    }, 12), 8, 96);
+  }
+
+  function runAssessment() {
+    const text = (eventText?.value || "").trim();
+    if (!text) {
+      showToast("请先输入事件描述");
+      eventText?.focus();
+      return;
+    }
+
+    const dimensions = Object.fromEntries(Object.entries(SIGNALS).map(([key, groups]) => [key, signalScore(text, groups)]));
+    const weighted = Math.round(dimensions.spread * 0.25 + dimensions.impact * 0.25 + dimensions.evidence * 0.15 + dimensions.regulatory * 0.2 + dimensions.organization * 0.15);
+    const score = clamp(weighted, 0, 100);
+    let level = score >= 82 ? 5 : score >= 65 ? 4 : score >= 45 ? 3 : score >= 25 ? 2 : 1;
+    if (dimensions.impact >= 76 || dimensions.regulatory >= 76) level = Math.max(level, 4);
+    if (text.includes("死亡") || text.includes("系统性造假")) level = 5;
+    const descriptor = ASSESSMENT_LEVELS[level - 1];
+
+    const heroScore = $("#heroRiskScore");
+    const overallScore = $("#overallRiskScore");
+    if (heroScore) heroScore.textContent = String(score);
+    if (overallScore) overallScore.textContent = String(score);
+    const levelCode = $("#heroLevelCode");
+    const levelName = $("#heroLevelName");
+    const levelAction = $("#heroLevelAction");
+    const levelNote = $("#currentLevelNote");
+    if (levelCode) levelCode.textContent = "L" + level;
+    if (levelName) levelName.textContent = descriptor.name;
+    if (levelAction) levelAction.textContent = descriptor.action;
+    if (levelNote) levelNote.textContent = "当前事件：L" + level;
+
+    const matchedSignals = Object.values(SIGNALS).flatMap((groups) => groups.flatMap((group) => group.words.filter((word) => text.includes(word))));
+    const setText = (selector, value) => { const node = $(selector); if (node) node.textContent = value; };
+    setText("#signalCount", String(matchedSignals.length));
+    setText("#unknownCount", String(Math.max(1, 5 - matchedSignals.length)));
+    setText("#responseLevel", descriptor.response);
+    setText("#assessmentState", "已完成初筛");
+    setText("#sideLevel", "L" + level);
+    setText("#sideLevelName", descriptor.name);
+    const currentTitle = text.slice(0, 18).replace(/[\r\n]+/g, " ") + (text.length > 18 ? "…" : "");
+    setText("#workspaceTitle", currentTitle);
+    setText("#crumbTitle", currentTitle);
+    setText("#progressLabel", "40%");
+    setText("#progressHint", "初筛完成 · 待人工核实与处置");
+    const progressBar = $("#progressBar");
+    if (progressBar) progressBar.style.width = "40%";
+    setText("#scanStatus", "本地关键词初筛完成");
+    setText("#scanPercent", "100%");
+    const scanBar = $("#scanBar");
+    if (scanBar) scanBar.style.width = "100%";
+
+    $$(".level-row[data-level]").forEach((row) => {
+      const active = Number(row.dataset.level) === level;
+      row.classList.toggle("active", active);
+      row.setAttribute("aria-current", active ? "true" : "false");
+    });
+    const dimensionsNode = $(".dimensions");
+    const dimensionNames = { spread: "传播速度", impact: "权益受损程度", evidence: "事实信号强度", regulatory: "监管风险", organization: "组织脆弱性" };
+    Object.entries(dimensions).forEach(([key, value]) => {
+      const valueNode = $(`[data-dimension="${key}"]`);
+      const barNode = $(`[data-dimension-bar="${key}"]`);
+      if (valueNode) valueNode.textContent = String(value);
+      if (barNode) barNode.style.width = value + "%";
+    });
+    if (dimensionsNode) dimensionsNode.setAttribute("aria-label", "初步识别的五个风险维度");
+
+    const summary = $("#assessmentSummary");
+    if (summary) summary.textContent = `本地关键词规则估算综合风险 ${score}/100，初步判断为 L${level} ${descriptor.name}。识别到 ${matchedSignals.length} 个文本信号；结果不代表事实已核实，需结合原始证据复核。`;
+    const reason = $("#levelReason");
+    if (reason) reason.textContent = `初步等级：L${level} ${descriptor.name}。建议：${descriptor.action}`;
+    setText("#forecastLabel", level >= 4 ? "需立即升级" : level >= 3 ? "持续关注" : "暂无升级信号");
+    setText("#forecastText", "优先核实影响对象、是否仍有新增损害、主管部门是否介入，以及现有应对是否有效。");
+    setText("#heroBriefText", `依据输入文本命中 ${matchedSignals.length} 个风险信号，当前规则初筛为 L${level} ${descriptor.name}。${descriptor.action}`);
+    setText("#factNarrative", `当前描述共 ${text.length} 字。系统只识别文本中明确出现的风险词，不会验证其真伪；请补充原始材料、来源和待确认信息。`);
+    setText("#stakeholderNarrative", "逐一确认直接受影响人员、合作方、员工、客户或其他相关对象，并记录各方当前的安全与业务需求。");
+    setText("#actionNarrative", descriptor.action + " 为每项行动明确负责人、完成时限和复核方式。");
+    setText("#planStatus", "初筛 L" + level);
+    setText("#planIntro", `根据初步等级 L${level} ${descriptor.name}，建议先完成下列通用动作；如发现人员安全风险，立即联系当地应急或主管部门。`);
+    const actionList = $("#actionList");
+    if (actionList) actionList.innerHTML = [
+      ["01", "确认即时风险", level >= 4 ? "优先确认人员安全、持续损害和是否需要立即升级响应。" : "确认是否存在人员安全、财产损失或持续扩大的影响。"],
+      ["02", "保全并核实信息", "保留原始材料与时间线，区分已确认事实、报告内容和推测。"],
+      ["03", "分派行动责任", "指定负责人、完成时限、沟通对象和结果复核方式。"]
+    ].map(([number, title, detail]) => `<li><span>${number}</span><div><b>${title}</b><small>${detail}</small></div></li>`).join("");
+    assessmentComplete = true;
+    ["case", "pr"].forEach((type) => {
+      const workspace = $(`#${type}Workspace`);
+      const upload = $(`#${type}DataInput`);
+      const filter = $(`#${type}Filter`);
+      if (workspace) workspace.classList.add("ready");
+      if (upload) upload.disabled = false;
+      if (filter) filter.disabled = false;
+      setText(`#${type}DataStatus`, "已开放上传 · 文件仅在此浏览器读取");
+      const gate = $(`#${type}Gate b`);
+      if (gate) gate.textContent = type === "case" ? `当前研判：L${level} ${descriptor.name} · 可上传相似案例` : `当前研判：L${level} ${descriptor.name} · 可上传公关资源`;
+    });
+    const ring = $(".risk-ring");
+    const ringValue = $("#heroRing");
+    if (ringValue) ringValue.setAttribute("stroke-dasharray", `${(541 * score / 100).toFixed(1)} 541`);
+    if (ring) ring.setAttribute("aria-label", `风险指数 ${score}，总分 100，初步判断 L${level} ${descriptor.name}`);
+    showToast(`识别完成：初步判断为 L${level} ${descriptor.name} · 风险分 ${score}`);
+    $("#analysis")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  $("#assessBtn")?.addEventListener("click", runAssessment);
+  eventText?.addEventListener("keydown", (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") runAssessment();
+  });
+
+  function splitCsvRow(line) {
+    const values = [];
+    let value = "";
+    let quoted = false;
+    for (let index = 0; index < line.length; index += 1) {
+      const char = line[index];
+      if (char === '"' && quoted && line[index + 1] === '"') { value += '"'; index += 1; }
+      else if (char === '"') quoted = !quoted;
+      else if (char === "," && !quoted) { values.push(value.trim()); value = ""; }
+      else value += char;
+    }
+    values.push(value.trim());
+    return values;
+  }
+
+  function parseComparisonFile(file, content) {
+    const extension = file.name.split(".").pop().toLowerCase();
+    if (extension === "json") {
+      const parsed = JSON.parse(content);
+      const rows = Array.isArray(parsed) ? parsed : parsed.records || parsed.items || parsed.cases || parsed.agencies || [parsed];
+      return rows.map((row) => typeof row === "object" && row !== null ? row : { 内容: String(row) });
+    }
+    if (extension === "csv") {
+      const lines = content.split(/\r?\n/).filter((line) => line.trim());
+      if (lines.length < 2) return [];
+      const headers = splitCsvRow(lines.shift());
+      return lines.map((line) => Object.fromEntries(splitCsvRow(line).map((value, index) => [headers[index] || `字段${index + 1}`, value])));
+    }
+    return content.split(/\r?\n/).map((line) => line.trim()).filter(Boolean).map((line) => ({ 名称: line }));
+  }
+
+  function comparisonTitle(record, index) {
+    const key = ["name", "title", "名称", "案例", "机构名称", "机构", "公司", "服务名称", "company", "case"].find((field) => record[field]);
+    return key ? String(record[key]) : `资料条目 ${index + 1}`;
+  }
+
+  function comparisonValue(value) {
+    if (value === null || value === undefined) return "—";
+    if (typeof value === "object") return JSON.stringify(value);
+    return String(value);
+  }
+
+  function renderComparison(type) {
+    const prefix = type === "cases" ? "case" : "pr";
+    const list = $(`#${prefix}DataItems`);
+    const compare = $(`#${prefix}Compare`);
+    const query = ($(`#${prefix}Filter`)?.value || "").trim().toLowerCase();
+    const records = uploadedComparisonData[type];
+    if (!list || !compare) return;
+    list.replaceChildren();
+    const visible = records.map((item, index) => ({ item, index })).filter(({ item }) => !query || `${comparisonTitle(item.data, 0)} ${Object.values(item.data).map(comparisonValue).join(" ")}`.toLowerCase().includes(query));
+    if (!visible.length) {
+      const empty = document.createElement("p");
+      empty.className = "dataset-empty";
+      empty.textContent = records.length ? "没有匹配的条目" : "尚未上传数据";
+      list.appendChild(empty);
+    }
+    visible.forEach(({ item, index }) => {
+      const label = document.createElement("label");
+      label.className = "dataset-option";
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = Boolean(item.selected);
+      const copy = document.createElement("span");
+      const title = document.createElement("b");
+      title.textContent = comparisonTitle(item.data, index);
+      const detail = document.createElement("small");
+      detail.textContent = `${item.source} · ${Object.keys(item.data).length} 个字段`;
+      copy.append(title, detail);
+      label.append(checkbox, copy);
+      checkbox.addEventListener("change", () => {
+        const selected = records.filter((record) => record.selected);
+        if (checkbox.checked && selected.length >= 3) {
+          checkbox.checked = false;
+          showToast("每次最多选择 3 项比较");
+          return;
+        }
+        item.selected = checkbox.checked;
+        renderComparisonTable(type);
+      });
+      list.appendChild(label);
+    });
+    renderComparisonTable(type);
+  }
+
+  function renderComparisonTable(type) {
+    const prefix = type === "cases" ? "case" : "pr";
+    const target = $(`#${prefix}Compare`);
+    const selected = uploadedComparisonData[type].filter((item) => item.selected);
+    if (!target) return;
+    target.replaceChildren();
+    const heading = document.createElement("b");
+    heading.textContent = type === "cases" ? "案例比较区" : "公关资源比较区";
+    target.appendChild(heading);
+    if (!selected.length) {
+      const hint = document.createElement("p");
+      hint.textContent = "勾选最多 3 项后，将按上传数据中的共有字段进行对照。";
+      target.appendChild(hint);
+      return;
+    }
+    const keys = Array.from(new Set(selected.flatMap((item) => Object.keys(item.data)))).slice(0, 12);
+    const table = document.createElement("table");
+    const head = document.createElement("tr");
+    ["比较项", ...selected.map((item, index) => comparisonTitle(item.data, index))].forEach((text) => {
+      const cell = document.createElement("th"); cell.textContent = text; head.appendChild(cell);
+    });
+    const thead = document.createElement("thead"); thead.appendChild(head); table.appendChild(thead);
+    const tbody = document.createElement("tbody");
+    keys.forEach((key) => {
+      const row = document.createElement("tr");
+      const label = document.createElement("th"); label.textContent = key; row.appendChild(label);
+      selected.forEach((item) => { const cell = document.createElement("td"); cell.textContent = comparisonValue(item.data[key]); row.appendChild(cell); });
+      tbody.appendChild(row);
+    });
+    table.appendChild(tbody); target.appendChild(table);
+  }
+
+  async function loadComparisonFiles(type, files) {
+    if (!assessmentComplete) { showToast("请先完成上方事件判断"); return; }
+    const records = uploadedComparisonData[type];
+    let loaded = 0;
+    for (const file of Array.from(files)) {
+      if (file.size > 5 * 1024 * 1024) { showToast(`${file.name} 超过 5 MB，已跳过`); continue; }
+      try {
+        const parsed = parseComparisonFile(file, await file.text());
+        parsed.forEach((data) => records.push({ source: file.name, data, selected: false }));
+        loaded += parsed.length;
+      } catch (error) { showToast(`${file.name} 无法读取，请检查文件格式`); }
+    }
+    renderComparison(type);
+    const label = type === "cases" ? "案例" : "公关数据";
+    const prefix = type === "cases" ? "case" : "pr";
+    const status = $(`#${prefix}DataStatus`);
+    if (status) status.textContent = `已载入 ${records.length} 条${label} · 可勾选最多 3 项比较`;
+    if (loaded) showToast(`已从上传文件读取 ${loaded} 条${label}资料`);
+  }
+
+  [["caseDataInput", "cases"], ["prDataInput", "pr"]].forEach(([id, type]) => {
+    $(`#${id}`)?.addEventListener("change", (event) => {
+      if (event.target.files?.length) loadComparisonFiles(type, event.target.files);
+      event.target.value = "";
+    });
+  });
+  $("#caseFilter")?.addEventListener("input", () => renderComparison("cases"));
+  $("#prFilter")?.addEventListener("input", () => renderComparison("pr"));
+
+  $("#loadDemo")?.addEventListener("click", () => {
+    try { ["prism-event-draft-v2", "prism-followup-v1", "prism-handling-v1"].forEach((key) => localStorage.removeItem(key)); } catch (error) { /* 忽略不可用的本地存储 */ }
+    location.reload();
+  });
+
+  /* Tags */
+  const tagWrap = $("#tagInputWrap");
+  const tagInput = $("#tagInput");
+
+  function createTag(text) {
+    const chip = document.createElement("span");
+    chip.className = "tag-chip";
+    chip.textContent = text;
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.setAttribute("aria-label", "删除关键词 " + text);
+    remove.textContent = "×";
+    chip.appendChild(remove);
+    return chip;
+  }
+
+  function addTag(raw) {
+    const value = raw.trim().replace(/[，,]/g, "");
+    if (!value || value.length > 18) return;
+    const existing = $$(".tag-chip", tagWrap).map((chip) => chip.firstChild?.textContent?.trim());
+    if (existing.includes(value)) {
+      showToast("这个关键词已经存在");
+      return;
+    }
+    const input = $("#tagInput");
+    tagWrap.insertBefore(createTag(value), input);
+    showToast("已添加关键词：" + value);
+  }
+
+  tagInput?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === "," || event.key === "，") {
+      event.preventDefault();
+      if (tagInput.value.trim()) {
+        addTag(tagInput.value);
+        tagInput.value = "";
+      }
+    }
+    if (event.key === "Backspace" && !tagInput.value) {
+      const chips = $$(".tag-chip", tagWrap);
+      if (chips.length) chips[chips.length - 1].remove();
+    }
+  });
+
+  tagWrap?.addEventListener("click", (event) => {
+    const button = event.target.closest("button");
+    if (!button) return;
+    button.closest(".tag-chip")?.remove();
+  });
+
+  /* Channels */
+  $$(".channel").forEach((button) => {
+    button.addEventListener("click", () => {
+      const isActive = button.classList.contains("active");
+      const activeCount = $$(".channel.active").length;
+      if (isActive && activeCount === 1) {
+        showToast("至少保留一个监测渠道");
+        return;
+      }
+      button.classList.toggle("active", !isActive);
+      button.setAttribute("aria-pressed", String(!isActive));
+    });
+  });
+
+  /* Files */
+  const fileInput = $("#fileInput");
+  const fileList = $("#fileList");
+  const dropzone = $("#dropzone");
+
+  function formatSize(bytes) {
+    if (bytes >= 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+    if (bytes >= 1024) return Math.round(bytes / 1024) + " KB";
+    return bytes + " B";
+  }
+
+  function renderFiles(files) {
+    if (!fileList) return;
+    Array.from(files).slice(0, 4).forEach((file) => {
+      if ($$(".file-chip", fileList).some((chip) => chip.dataset.name === file.name)) return;
+      const chip = document.createElement("div");
+      chip.className = "file-chip";
+      chip.dataset.name = file.name;
+      const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      icon.setAttribute("class", "icon");
+      const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+      use.setAttribute("href", file.type.startsWith("video/") ? "#i-video" : "#i-file");
+      icon.appendChild(use);
+      const name = document.createElement("span");
+      name.textContent = file.name;
+      const size = document.createElement("em");
+      size.textContent = formatSize(file.size);
+      chip.append(icon, name, size);
+      fileList.appendChild(chip);
+    });
+    if (files.length) {
+      showToast("已加入 " + Math.min(files.length, 4) + " 个素材，等待解析");
+    }
+  }
+
+  fileInput?.addEventListener("change", () => {
+    if (fileInput.files?.length) renderFiles(fileInput.files);
+    fileInput.value = "";
+  });
+
+  if (dropzone) {
+    ["dragenter", "dragover"].forEach((name) => {
+      dropzone.addEventListener(name, (event) => {
+        event.preventDefault();
+        dropzone.classList.add("dragover");
+      });
+    });
+    ["dragleave", "drop"].forEach((name) => {
+      dropzone.addEventListener(name, (event) => {
+        event.preventDefault();
+        dropzone.classList.remove("dragover");
+      });
+    });
+    dropzone.addEventListener("drop", (event) => {
+      if (event.dataTransfer?.files?.length) renderFiles(event.dataTransfer.files);
+    });
+  }
+
+  /* Scan simulation */
+  const scanStages = [
+    ["解析素材与抽取实体", 12],
+    ["扩展关键词与同义词", 29],
+    ["检索微博 / 抖音 / 小红书", 54],
+    ["去重、聚类与信源分级", 78],
+    ["事实抽取与风险信号识别", 100]
+  ];
+
+  function selectedChannels() {
+    return $$(".channel.active").map((button) => button.dataset.channel);
+  }
+
+  function resetScanButton() {
+    const button = $("#scanBtn");
+    if (!button) return;
+    button.disabled = false;
+    button.innerHTML = '<svg class="icon"><use href="#i-radar"/></svg><span>启动全网扫描</span>';
+  }
+
+  $("#scanBtn")?.addEventListener("click", () => {
+    if (state.scanning) return;
+    if (!eventText?.value.trim()) {
+      showToast("先输入一段事件描述，再启动扫描");
+      eventText?.focus();
+      return;
+    }
+    const channels = selectedChannels();
+    if (!channels.length) {
+      showToast("至少选择一个监测渠道");
+      return;
+    }
+
+    state.scanning = true;
+    const button = $("#scanBtn");
+    const panel = $(".scan-panel");
+    const status = $("#scanStatus");
+    const bar = $("#scanBar");
+    const percent = $("#scanPercent");
+    let stage = 0;
+
+    panel?.classList.add("scanning");
+    button.disabled = true;
+    if (bar) bar.style.width = "4%";
+    if (percent) percent.textContent = "4%";
+
+    function runStage() {
+      if (stage >= scanStages.length) {
+        state.scanning = false;
+        panel?.classList.remove("scanning");
+        resetScanButton();
+        if (status) status.textContent = "扫描完成 · 新增 236 条 · 刚刚";
+        if (bar) bar.style.width = "100%";
+        if (percent) percent.textContent = "100%";
+        const sourceCount = $("#sourceCount");
+        if (sourceCount) sourceCount.textContent = "1,520";
+        showToast("扫描完成：新增 236 条公开信源");
+        return;
+      }
+      const [label, value] = scanStages[stage];
+      if (status) status.textContent = "正在" + label + "…";
+      if (bar) bar.style.width = value + "%";
+      if (percent) percent.textContent = value + "%";
+      button.innerHTML = '<svg class="icon"><use href="#i-radar"/></svg><span>扫描中 · ' + Math.min(stage + 1, 5) + "/5</span>";
+      stage += 1;
+      setTimeout(runStage, 700);
+    }
+
+    runStage();
+    showToast("已锁定 " + channels.length + " 个公开信源域：" + channels.join(" / "));
+  });
+
+  /* ---------------------------------------------------------
+     STRATEGY SELECTION & SIMULATION
+     --------------------------------------------------------- */
+  const strategyGrid = $("#strategyGrid");
+  const simPanel = $(".sim-panel");
+
+  function getSelectedIds() {
+    return $$('input[data-strategy]:checked').map((input) => input.dataset.strategy);
+  }
+
+  function has(ids, id) {
+    return ids.includes(id);
+  }
+
+  function computeConflicts(ids) {
+    const conflicts = [];
+    if (has(ids, "e") && ids.some((id) => ["a", "b", "c", "d"].includes(id))) {
+      conflicts.push("「冷处理」与主动回应互斥，同时执行会向公众释放矛盾信号。");
+    }
+    if (has(ids, "e") && has(ids, "f")) {
+      conflicts.push("冷处理叠加法律动作，会同时延长话题生命周期并放大对抗感。");
+    }
+    if (has(ids, "d") && has(ids, "f")) {
+      conflicts.push("创始人直播与法律反制并置，容易把「对话」变成「施压」。");
+    }
+    if (has(ids, "f") && ids.some((id) => ["a", "b", "c"].includes(id))) {
+      conflicts.push("法律动作与修复动作并存，必须明确「维权只针对造谣，不针对消费者」。");
+    }
+    if (has(ids, "c") && !has(ids, "a")) {
+      conflicts.push("补偿先行但缺少定调，容易被解读为「心虚式封口」。");
+    }
+    if (has(ids, "a") && !has(ids, "b") && !has(ids, "c")) {
+      conflicts.push("只有承诺没有证据，24 小时内出现二次质疑的概率较高。");
+    }
+    if (ids.length > 4) {
+      conflicts.push("动作超过 4 项，24 小时内的组织执行带宽可能不足。");
+    }
+    return conflicts;
+  }
+
+  function computeResult(ids) {
+    if (!ids.length) return null;
+    const probs = ids.map((id) => STRATEGIES[id].prob);
+    const average = probs.reduce((sum, prob) => sum + prob, 0) / probs.length;
+    const conflicts = computeConflicts(ids);
+    const hasA = has(ids, "a");
+    const hasB = has(ids, "b");
+    const hasC = has(ids, "c");
+    const hasD = has(ids, "d");
+    const hasE = has(ids, "e");
+    const hasF = has(ids, "f");
+
+    let bonus = 0;
+    if (hasA && hasB) bonus += 2;
+    if (hasB && hasC) bonus += 2;
+    if (hasA && hasC) bonus += 1;
+    if (hasA && hasB && hasC) bonus += 1;
+    if (hasD) bonus += 1;
+    if (hasD && (hasE || hasF)) bonus -= 6;
+    if (hasE && hasF) bonus -= 5;
+    if (hasE) bonus -= 3;
+    if (hasF) bonus -= 4;
+
+    let score = average + bonus - Math.max(0, ids.length - 3) * 1.5;
+    if (hasE) score = Math.min(score, 46);
+    if (hasF) score = Math.min(score, 54);
+    if (hasE && hasF) score = Math.min(score, 38);
+    score = Math.round(clamp(score, 18, 88));
+
+    let heatDrop = score * 0.5 + (hasC ? 3 : 0) + (hasB ? 2 : 0) + (hasD ? 2 : 0) - (hasE ? 16 : 0) - (hasF ? 8 : 0);
+    heatDrop = Math.round(clamp(heatDrop, 8, 55));
+
+    let trustLift = score * 0.16 + (hasA ? 2 : 0) + (hasC ? 3 : 0) + (hasB ? 1 : 0) - (hasE ? 5 : 0) - (hasF ? 5 : 0);
+    trustLift = Math.round(clamp(trustLift, 0, 25));
+
+    const totalCost = ids.reduce((sum, id) => sum + STRATEGIES[id].cost, 0);
+    const budgetLow = Math.max(2, Math.round(totalCost * 0.72));
+    const budgetHigh = Math.max(budgetLow + 3, Math.round(totalCost * 1.16));
+    const riskLabel = score >= 78 ? "中低" : score >= 62 ? "中" : score >= 45 ? "中高" : "高";
+
+    let narrative;
+    if (hasE && ids.some((id) => ["a", "b", "c"].includes(id))) {
+      narrative = "主动回应与冷处理正在互相抵消。若决定回应，就应撤下「等待热度下降」的预期，把资源集中到定调与实质修复上。";
+    } else if (hasE && hasF) {
+      narrative = "两条高对抗路径叠加，可能让事件从产品争议升级为权力对抗。建议先完成证据保全，再决定是否公开动作。";
+    } else if (score >= 78) {
+      narrative = "先用 4 小时声明界定事实，再用第三方检测与工厂直播补足证据，最后用批次补偿完成实质修复。三条线互相支撑，避免「只道歉不行动」。";
+    } else if (hasF) {
+      narrative = "法律动作正在占据主叙事，但当前更需要的是降低对抗、补足证据。把法律手段留到证据完整之后，先让消费者看到可验证的修复。";
+    } else if (hasE) {
+      narrative = "当前仍处于扩散期，单独冷处理会让沉默被解读为默认。至少保留一条低成本的「事实更新」通道，并设定升温后的切换条件。";
+    } else if (hasD && !hasA) {
+      narrative = "创始人出面能增加人格化担责，但在事实边界未清时直播，容易变成二次事故现场。建议先完成事实卡片与高频质疑清单。";
+    } else if (ids.length === 1) {
+      narrative = "单点动作可以降低协调成本，但很难同时解决「定调、举证、修复」三个问题。建议至少补充一条证据线或一条修复线。";
+    } else {
+      narrative = "当前组合具备一定协同，但还缺少明确的执行顺序。先定调、再举证、后修复，通常比同时铺开更可控。";
+    }
+
+    return {
+      ids: ids.slice().sort((x, y) => STRATEGIES[x].rank - STRATEGIES[y].rank),
+      score,
+      average: Math.round(average),
+      heatDrop,
+      trustLift,
+      budgetLow,
+      budgetHigh,
+      riskLabel,
+      conflicts,
+      narrative
+    };
+  }
+
+  function setConflictMini(conflicts) {
+    const node = $("#conflictMini");
+    if (!node) return;
+    const count = conflicts.length;
+    node.classList.toggle("warn", count > 0);
+    node.innerHTML =
+      '<svg class="icon"><use href="' + (count ? "#i-alert" : "#i-check") + '"/></svg>' +
+      (count ? count + " 项逻辑冲突" : "逻辑一致");
+  }
+
+  function updateSelectionUI() {
+    const ids = getSelectedIds();
+    state.selected = new Set(ids);
+    $$(".strategy-card", strategyGrid).forEach((card) => {
+      const input = $("input[data-strategy]", card);
+      card.classList.toggle("selected", Boolean(input?.checked));
+    });
+    const count = $("#selectedCount");
+    if (count) count.textContent = String(ids.length);
+    const conflicts = computeConflicts(ids);
+    setConflictMini(conflicts);
+    const conflictBox = $("#conflictBox");
+    const conflictText = $("#conflictText");
+    if (conflictBox && conflictText) {
+      const hasConflict = conflicts.length > 0;
+      conflictBox.classList.toggle("warn", hasConflict);
+      conflictBox.querySelector("use")?.setAttribute("href", hasConflict ? "#i-alert" : "#i-check");
+      conflictText.textContent = hasConflict
+        ? conflicts[0]
+        : "未发现策略冲突。声明、举证、补偿形成闭环。";
+    }
+    simPanel?.classList.add("pending");
+    const runButton = $("#runSim");
+    const runSide = $("#runSimSide");
+    if (runButton && !runButton.disabled) {
+      const label = $("span", runButton);
+      if (label) label.textContent = ids.length ? "运行组合推演" : "请选择策略";
+    }
+    if (runSide && !runSide.disabled) {
+      const label = $("span", runSide);
+      if (label) label.textContent = ids.length ? "运行组合推演" : "请选择策略";
+    }
+  }
+
+  strategyGrid?.addEventListener("change", (event) => {
+    if (event.target.matches("input[data-strategy]")) {
+      updateSelectionUI();
+    }
+  });
+
+  $$(".resource-toggle").forEach((button) => {
+    button.addEventListener("click", () => {
+      const drawer = button.nextElementSibling;
+      if (!drawer) return;
+      const open = drawer.classList.toggle("open");
+      button.setAttribute("aria-expanded", String(open));
+    });
+  });
+
+  function renderSequence(ids) {
+    const node = $("#sequenceList");
+    if (!node) return;
+    const sorted = ids.slice().sort((x, y) => STRATEGIES[x].rank - STRATEGIES[y].rank);
+    if (!sorted.length) {
+      node.innerHTML = "<span>尚未选择</span>";
+      return;
+    }
+    node.innerHTML = sorted
+      .map((id) => "<b>" + id.toUpperCase() + "</b>")
+      .join("<i>→</i>");
+  }
+
+  function renderTimeline(ids) {
+    const node = $("#timelineList");
+    if (!node) return;
+    const hasA = has(ids, "a");
+    const hasB = has(ids, "b");
+    const hasC = has(ids, "c");
+    const hasD = has(ids, "d");
+    const hasE = has(ids, "e");
+    const hasF = has(ids, "f");
+    const steps = [];
+
+    if (hasA) steps.push(["T+0–4h", "定调", "发布事实边界声明，开通批次查询与退款入口。"]);
+    if (hasC) steps.push(["T+4–12h", "止血", "封存争议批次，公布补偿规则，覆盖线上与线下渠道。"]);
+    if (hasB) steps.push(["T+12–24h", "举证", "第三方送检，开放工厂直播；公布抽样与封存信息。"]);
+    if (hasD) steps.push(["T+24h", "对话", "创始人直播问答，回答高频质疑并承诺下一次更新。"]);
+    if (hasF) steps.push(["T+24h+", "取证", "完成证据保全与公证，仅对组织化造谣启动法律动作。"]);
+    if (hasE) steps.push(["T+48–72h", "观察", "监测热度与监管信号；触发阈值即切换到主动回应。"]);
+    steps.push(["T+72h", "复核", "发布整改清单与第三方复核报告，回应新增质疑。"]);
+
+    const visible = steps.slice(0, 4);
+    visible.push(["T+7d", "复盘", "公开整改进度，启动长期供应链透明化项目。"]);
+
+    node.innerHTML = visible
+      .map(
+        ([time, title, description]) =>
+          '<div class="timeline-item"><span class="tl-time">' +
+          time +
+          '</span><div><b>' +
+          title +
+          "</b><p>" +
+          description +
+          "</p></div></div>"
+      )
+      .join("");
+  }
+
+  function svgPoints(values) {
+    const left = 52;
+    const right = 24;
+    const top = 32;
+    const bottom = 246;
+    const width = 760 - left - right;
+    return values.map((value, index) => ({
+      x: left + (index * width) / 6,
+      y: bottom - (value / 100) * (bottom - top)
+    }));
+  }
+
+  function smoothPath(points) {
+    if (!points.length) return "";
+    let path = "M " + points[0].x.toFixed(2) + " " + points[0].y.toFixed(2);
+    for (let i = 0; i < points.length - 1; i += 1) {
+      const p0 = points[i - 1] || points[i];
+      const p1 = points[i];
+      const p2 = points[i + 1];
+      const p3 = points[i + 2] || p2;
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = p1.y + (p2.y - p0.y) / 6;
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = p2.y - (p3.y - p1.y) / 6;
+      path +=
+        " C " +
+        cp1x.toFixed(2) +
+        " " +
+        cp1y.toFixed(2) +
+        ", " +
+        cp2x.toFixed(2) +
+        " " +
+        cp2y.toFixed(2) +
+        ", " +
+        p2.x.toFixed(2) +
+        " " +
+        p2.y.toFixed(2);
+    }
+    return path;
+  }
+
+  function currentSeries(score) {
+    const end = clamp(100 - score * 0.83, 12, 82);
+    const peak = clamp(55 + (100 - score) * 0.55, 45, 90);
+    return [42, 1, 2, 3, 4, 5, 6].map((day) => {
+      if (day === 0) return 42;
+      const value = end + (peak - end) * Math.exp(-Math.pow(day - 2.1, 2) / 2.9);
+      return Math.round(clamp(value, 10, 98));
+    });
+  }
+
+  function renderChart(score) {
+    const baseline = [42, 70, 81, 89, 93, 95, 96];
+    const statement = [42, 64, 67, 63, 60, 57, 55];
+    const current = currentSeries(score);
+    const basePoints = svgPoints(baseline);
+    const statementPoints = svgPoints(statement);
+    const currentPoints = svgPoints(current);
+
+    $("#lineBaseline")?.setAttribute("d", smoothPath(basePoints));
+    $("#lineStatement")?.setAttribute("d", smoothPath(statementPoints));
+    $("#lineCurrent")?.setAttribute("d", smoothPath(currentPoints));
+
+    const area = $("#areaCurrent");
+    if (area) {
+      const last = currentPoints[currentPoints.length - 1];
+      const first = currentPoints[0];
+      area.setAttribute(
+        "d",
+        smoothPath(currentPoints) +
+          " L " +
+          last.x.toFixed(2) +
+          " 246 L " +
+          first.x.toFixed(2) +
+          " 246 Z"
+      );
+    }
+
+    const dots = $("#chartDots");
+    if (dots) {
+      const last = currentPoints[currentPoints.length - 1];
+      dots.innerHTML =
+        '<circle class="chart-dot" cx="' +
+        last.x.toFixed(2) +
+        '" cy="' +
+        last.y.toFixed(2) +
+        '" r="3.5"/>';
+    }
+  }
+
+  function renderSimulation(result, options = {}) {
+    if (!result) return;
+    const scoreNode = $("#simScore");
+    const ring = $("#simRing");
+    if (scoreNode) scoreNode.textContent = String(result.score);
+    if (ring) {
+      const circumference = 2 * Math.PI * 58;
+      const dash = (result.score / 100) * circumference;
+      ring.style.strokeDasharray = dash.toFixed(1) + " " + circumference.toFixed(1);
+    }
+
+    const delta = $("#simDelta");
+    if (delta) {
+      const diff = result.score - result.average;
+      delta.textContent = "相对单一手段均值 " + (diff >= 0 ? "+" : "−") + Math.abs(diff) + "pp";
+    }
+
+    const heat = $("#heatDrop");
+    if (heat) heat.textContent = "−" + result.heatDrop + "%";
+    const trust = $("#trustLift");
+    if (trust) trust.textContent = "+" + result.trustLift;
+    const budget = $("#budget");
+    if (budget) budget.innerHTML = result.budgetLow + "–" + result.budgetHigh + "<small>万</small>";
+    const risk = $("#riskLabel");
+    if (risk) risk.textContent = result.riskLabel;
+
+    renderSequence(result.ids);
+    renderTimeline(result.ids);
+    renderChart(result.score);
+
+    const narrative = $("#simNarrative");
+    if (narrative) narrative.textContent = result.narrative;
+
+    const conflictBox = $("#conflictBox");
+    const conflictText = $("#conflictText");
+    if (conflictBox && conflictText) {
+      const hasConflict = result.conflicts.length > 0;
+      conflictBox.classList.toggle("warn", hasConflict);
+      conflictBox.querySelector("use")?.setAttribute("href", hasConflict ? "#i-alert" : "#i-check");
+      conflictText.textContent = hasConflict
+        ? result.conflicts[0]
+        : "未发现策略冲突。声明、举证、补偿形成闭环。";
+    }
+
+    setConflictMini(result.conflicts);
+
+    const callout = $("#chartCallout");
+    if (callout) {
+      if (result.score >= 75) {
+        callout.innerHTML =
+          "<b>峰值出现在 48 小时内</b>，随后快速回落。真正决定长期损失的，是「代工」是否会成为品牌长期联想词。";
+      } else if (result.score < 55) {
+        callout.innerHTML =
+          "<b>热度可能在 72 小时后二次抬头。</b>缺少实质动作时，声明会被新的质疑稀释，需要设置明确的切换条件。";
+      } else {
+        callout.innerHTML =
+          "<b>舆情进入拉扯期。</b>动作之间尚未形成闭环，建议补齐「定调 / 举证 / 修复」中的缺口。";
+      }
+    }
+
+    const status = $("#simStatus");
+    if (status) {
+      const time = new Date().toLocaleTimeString("zh-CN", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      });
+      status.textContent =
+        "基于 " + result.ids.length + " 项策略 · " + (options.initial ? "上次推演 22:16" : "刚刚更新 " + time);
+    }
+
+    simPanel?.classList.remove("pending");
+    simPanel?.classList.add("calculated");
+    setTimeout(() => simPanel?.classList.remove("calculated"), 900);
+  }
+
+  function runSimulation(triggered) {
+    const ids = getSelectedIds();
+    if (!ids.length) {
+      showToast("至少选择一项策略，才能进行推演");
+      return;
+    }
+    const result = computeResult(ids);
+    if (!result) return;
+
+    const buttons = [$("#runSim"), $("#runSimSide")].filter(Boolean);
+    buttons.forEach((button) => setButtonBusy(button, true, "推演中…"));
+
+    setTimeout(() => {
+      renderSimulation(result);
+      buttons.forEach((button) => setButtonBusy(button, false, "运行组合推演"));
+      if (triggered) {
+        showToast("组合推演完成：目标达成概率 " + result.score + "%");
+        if (window.innerWidth < 1100) {
+          simPanel?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }
+    }, 720);
+  }
+
+  $("#runSim")?.addEventListener("click", () => runSimulation(true));
+  $("#runSimSide")?.addEventListener("click", () => runSimulation(true));
+
+  $("#restoreRecommended")?.addEventListener("click", () => {
+    $$('input[data-strategy]').forEach((input) => {
+      input.checked = RECOMMENDED.includes(input.dataset.strategy);
+    });
+    updateSelectionUI();
+    showToast("已恢复推荐组合：A 定调 → B 举证 → C 修复");
+  });
+
+  /* ---------------------------------------------------------
+     PROMPT TOOLKIT
+     --------------------------------------------------------- */
+  function renderPrompt(key) {
+    state.prompt = key;
+    const target = $("#promptText");
+    if (target) target.textContent = (PROMPTS[key] || "").replaceAll("{{事件材料}}", eventText?.value.trim() || "（请在事件描述框填写内容）");
+    $$(".prompt-tab").forEach((tab) => {
+      const active = tab.dataset.prompt === key;
+      tab.classList.toggle("active", active);
+      tab.setAttribute("aria-selected", String(active));
+    });
+  }
+
+  $$(".prompt-tab").forEach((tab) => {
+    tab.addEventListener("click", () => renderPrompt(tab.dataset.prompt));
+  });
+
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (error) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      textarea.style.top = "0";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      let copied = false;
+      try {
+        copied = document.execCommand("copy");
+      } catch (copyError) {
+        copied = false;
+      }
+      textarea.remove();
+      return copied;
+    }
+  }
+
+  $("#copyPrompt")?.addEventListener("click", async () => {
+    const copied = await copyText($("#promptText")?.textContent || "");
+    showToast(copied ? "提示词已复制，可直接粘贴使用" : "复制失败，请手动选择文本");
+  });
+
+  /* ---------------------------------------------------------
+     AGENCY FILTER
+     --------------------------------------------------------- */
+  $$(".filter").forEach((button) => {
+    button.addEventListener("click", () => {
+      const filter = button.dataset.filter;
+      $$(".filter").forEach((item) => item.classList.toggle("active", item === button));
+      let visible = 0;
+      $$(".agency-card").forEach((card) => {
+        const types = (card.dataset.type || "").split(/\s+/);
+        const show = filter === "all" || types.includes(filter);
+        card.classList.toggle("hidden", !show);
+        if (show) visible += 1;
+      });
+      const count = $("#agencyCount");
+      if (count) count.textContent = visible + " 家";
+    });
+  });
+
+  /* ---------------------------------------------------------
+     EXPORT BRIEF
+     --------------------------------------------------------- */
+  function exportBrief() {
+    const event = eventText?.value.trim();
+    if (!event) { showToast("请先填写事件描述"); eventText?.focus(); return; }
+    const now = new Date();
+    const stamp = now.toLocaleString("zh-CN", { hour12: false });
+    const title = $("#workspaceTitle")?.textContent || "事件研判";
+    const level = $("#heroLevelCode")?.textContent || "待判断";
+    const score = $("#overallRiskScore")?.textContent || "待判断";
+    const plan = $("#actionList")?.innerText || "待补充处置计划";
+    const notes = $("#handlingNotes")?.value.trim() || "暂无处置记录";
+    const markdown = `# PRISM 事件研判记录
+
+> 事件：${title}
+> 生成时间：${stamp}
+> 初步等级：${level}
+> 综合风险分：${score}/100
+
+## 事件描述
+
+${event}
+
+## 后续处理清单
+
+${plan}
+
+## 对话与补充记录
+
+${$("#chatThread")?.innerText || "暂无对话记录"}
+
+## 处置记录
+
+${notes}
+
+---
+此记录由本地关键词规则辅助生成。内容未经事实核验，不构成专业意见或最终决策。`;
+    const url = URL.createObjectURL(new Blob([markdown], { type: "text/markdown;charset=utf-8" }));
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "PRISM_事件研判_" + now.toISOString().slice(0, 10).replaceAll("-", "") + ".md";
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    showToast("事件研判记录已导出");
+  }
+
+  $$(".export-trigger").forEach((button) => button.addEventListener("click", exportBrief));
+
+  /* ---------------------------------------------------------
+     NAV / MOBILE / MISC
+     --------------------------------------------------------- */
+  const navLinks = $$(".side-nav a");
+  const sections = ["top", "input", "analysis", "followup", "strategy", "cases", "summary", "prompt", "partners"]
+    .map((id) => document.getElementById(id))
+    .filter(Boolean);
+
+  function updateActiveNav() {
+    const marker = window.scrollY + 150;
+    let current = sections[0];
+    sections.forEach((section) => {
+      if (section.offsetTop <= marker) current = section;
+    });
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 8) {
+      current = sections[sections.length - 1];
+    }
+    navLinks.forEach((link) => {
+      link.classList.toggle("active", link.getAttribute("href") === "#" + current.id);
+    });
+  }
+
+  let navTicking = false;
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (navTicking) return;
+      navTicking = true;
+      requestAnimationFrame(() => {
+        updateActiveNav();
+        navTicking = false;
+      });
+    },
+    { passive: true }
+  );
+
+  const sidebar = $("#sidebar");
+  const scrim = $("#sidebarScrim");
+  const mobileMenu = $("#mobileMenu");
+
+  function closeSidebar() {
+    sidebar?.classList.remove("open");
+    scrim?.classList.remove("show");
+  }
+
+  mobileMenu?.addEventListener("click", () => {
+    sidebar?.classList.toggle("open");
+    scrim?.classList.toggle("show");
+  });
+  scrim?.addEventListener("click", closeSidebar);
+  navLinks.forEach((link) => link.addEventListener("click", closeSidebar));
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeSidebar();
+  });
+
+  $("#newCaseBtn")?.addEventListener("click", () => {
+    try {
+      ["prism-event-draft-v2", "prism-followup-v1", "prism-handling-v1"].forEach((key) => localStorage.removeItem(key));
+    } catch (error) { /* 忽略不可用的本地存储 */ }
+    location.reload();
+  });
+
+  $("#addFollowup")?.addEventListener("click", () => {
+    const input = $("#followupInput");
+    const value = input?.value.trim();
+    if (!value) { showToast("请先填写补充情况或追问"); input?.focus(); return; }
+    const empty = $("#chatEmpty");
+    empty?.remove();
+    const entry = document.createElement("div");
+    entry.className = "chat-entry";
+    const stamp = document.createElement("small");
+    stamp.textContent = new Date().toLocaleString("zh-CN", { hour12: false });
+    const body = document.createElement("p");
+    body.textContent = value;
+    entry.append(stamp, body);
+    $("#chatThread")?.appendChild(entry);
+    const reply = document.createElement("div");
+    reply.className = "chat-entry assistant-entry";
+    const replyLabel = document.createElement("small");
+    replyLabel.textContent = "PRISM · 本地辅助提示";
+    const replyBody = document.createElement("p");
+    const assessedLevel = $("#heroLevelCode")?.textContent;
+    const hasAssessment = assessedLevel && assessedLevel.startsWith("L");
+    if (!hasAssessment) {
+      replyBody.textContent = "已记录补充内容。先在上方填写事件描述并点击「识别并判断等级」，再结合完整情况安排处置。请核对信息来源，并区分已确认事实与推测。";
+    } else if (/下一步|怎么办|如何处理|建议|行动|处理/.test(value)) {
+      replyBody.textContent = `当前初筛为 ${assessedLevel}。建议先确认是否存在持续损害或人员安全风险，再保全原始材料、核对关键事实，并为每项行动指定负责人和完成时限。重大或紧急风险请升级给相应负责人或主管部门。`;
+    } else if (/等级|风险|严重|级别/.test(value)) {
+      replyBody.textContent = `当前文本规则初筛为 ${assessedLevel}，综合风险分 ${$("#overallRiskScore")?.textContent || "待判断"}/100。该结果只用于提示核查优先级，不代表事实已确认；请根据新证据更新事件描述后重新研判。`;
+    } else if (/负责人|谁来|联系|通知/.test(value)) {
+      replyBody.textContent = "建议按事项指定岗位负责人：现场与人员安全、事实核查、法律合规、对外沟通和记录归档。请使用组织内已确认的职责分工与联络方式。";
+    } else {
+      replyBody.textContent = `已记录这条补充。请确认它是亲历信息、原始材料还是转述内容，并注明发生时间、来源和可能受影响对象；当前研判等级为 ${assessedLevel}，有新证据时可更新事件描述并重新判断。`;
+    }
+    reply.append(replyLabel, replyBody);
+    $("#chatThread")?.appendChild(reply);
+    reply.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    const notes = $("#handlingNotes");
+    if (notes) {
+      notes.value = [notes.value.trim(), value].filter(Boolean).join("\n");
+      try { localStorage.setItem("prism-handling-v1", notes.value); } catch (error) { /* 忽略不可用的本地存储 */ }
+    }
+    input.value = "";
+    try { localStorage.setItem("prism-followup-v1", $("#chatThread").innerText); } catch (error) { /* 忽略不可用的本地存储 */ }
+    showToast("已记录，并生成本地辅助提示");
+  });
+
+  $("#followupInput")?.addEventListener("keydown", (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+      event.preventDefault();
+      $("#addFollowup")?.click();
+    }
+  });
+
+  $("#saveHandling")?.addEventListener("click", () => {
+    try {
+      localStorage.setItem("prism-handling-v1", $("#handlingNotes")?.value || "");
+      showToast("处置记录已保存在当前浏览器");
+    } catch (error) { showToast("浏览器未允许本地保存，请复制保留记录"); }
+  });
+
+  /* ---------------------------------------------------------
+     INIT
+     --------------------------------------------------------- */
+  function init() {
+    updateCharCount();
+    try {
+      const savedFollowup = localStorage.getItem("prism-followup-v1");
+      const savedHandling = localStorage.getItem("prism-handling-v1");
+      if (savedHandling && $("#handlingNotes")) $("#handlingNotes").value = savedHandling;
+      if (savedFollowup && $("#chatThread")) {
+        $("#chatEmpty")?.remove();
+        const restored = document.createElement("div");
+        restored.className = "chat-entry restored";
+        const body = document.createElement("p");
+        body.textContent = savedFollowup;
+        restored.appendChild(body);
+        $("#chatThread").appendChild(restored);
+      }
+    } catch (error) { /* 本地存储不可用时使用空白工作区 */ }
+    renderPrompt("grade");
+    updateSelectionUI();
+    const initial = computeResult(RECOMMENDED);
+    renderSimulation(initial, { initial: true });
+    updateActiveNav();
+  }
+
+  init();
+})();
+
+</script>
+</body>
+</html>
